@@ -1,5 +1,5 @@
 /*
- * Name: Hanyang Yu, Brian Juan
+ * Name: Hanyang Yu, Brian Yuan
  * Date: May 6, 2023
  * Section: CSE 154 AF
  *
