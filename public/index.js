@@ -8,8 +8,8 @@
 "use strict";
 (function() {
   let userID = null;
+  let userEmail = null;
   window.addEventListener("load", init);
-
 
   /**
    * this function starts the my store website by enable
@@ -98,8 +98,9 @@
   function loginPage() {
     id('products').classList.add('hidden');
     id('container3').classList.remove('hidden');
-    id('submit').addEventListener('click', login);
+    id('submits').addEventListener('click', login);
     qs('.back-button').addEventListener('click', backToMain);
+    console.log('hi');
   }
 
   function backToMain() {
@@ -109,8 +110,10 @@
   }
 
   function login() {
+    console.log('login');
     let user = id('username').value;
     let password = id('password').value;
+    console.log(user);
     let url = '/future/login';
     let params = new FormData();
     params.append("name", user);
@@ -127,12 +130,19 @@
     console.log(responseData);
     if (responseData.length > 0){
       id('user').classList.remove('hidden');
-      userID = responseData;
-      id("submit").removeEventListener("click", login);
-      id("submit").style.color = "gray";
-      qs('.container2 h1').textContent = "Successfully logged in click on back"
-      qs('.container2 h1').style.color = "green";
+      userID = responseData[0].userID;
+      id("submits").removeEventListener("click", login);
+      id("submits").style.color = "gray";
+      qs('#container3 h1').textContent = "Successfully logged in click on back"
+      qs('#container3 h1').style.color = "green";
+      id('user').addEventListener('click', purchaseHistory);
+      id('save').classList.remove('hidden');
+      id('save').addEventListener('click', save);
     }
+  }
+
+  function save(){
+    id('username').textContent = userEmail;
   }
 
   /**
@@ -163,12 +173,18 @@
       let word = gen('h1');
       let p1 = gen('p');
       let button = gen('button');
+      let button2 = gen('button');
       let img = gen('img');
       let result = 'Future_PETS/' + responseData['Pets'][i].Name + '.jpg';
       word.textContent = responseData['Pets'][i].Name;
       img.src = result;
       product.classList.add('product');
       p1.classList.add('price');
+      button2.id = 'view';
+      button2.textContent = 'view item';
+      button2.para = responseData['Pets'][i].Name;
+      button2.paras = responseData['Pets'][i].Price;
+      button2.addEventListener('click', viewItem);
       button.id = 'add';
       button.textContent ='Add to Cart';
       button.addEventListener('click', async () => {
@@ -183,11 +199,23 @@
       product.appendChild(word);
       product.appendChild(img);
       product.appendChild(p1);
+      product.appendChild(button2);
       product.appendChild(button);
       product.id = responseData['Pets'][i].PetID;
       productTotal.appendChild(product);
     }
     id('products').appendChild(productTotal);
+  }
+
+  function viewItem(parameter) {
+    console.log('hi');
+    id('products').classList.add('hidden');
+    id('container2').classList.remove('hidden');
+    let name = parameter.currentTarget.para;
+    let price = parameter.currentTarget.paras;
+    let result = 'Future_PETS/' + name + '.jpg';
+    qs('.product-image img').src =result;
+    qs('.product-price').textContent = '$' + price;
   }
 
   function checkGrid() {
