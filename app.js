@@ -34,6 +34,22 @@ app.get('/future/all', async (req, res) => {
   await db.close();
 });
 
+app.post('/future/login', async (rq, rs) => {
+  let db = await getDBConnection();
+  let user = rq.body.name;
+  let password = rq.body.password;
+  let all = "SELECT userID FROM login where email = ? and digit = ?";
+  let getAll = await db.all(all, [user, password]);
+  if (getAll.length > 0) {
+    rs.type('text');
+    rs.send(getAll);
+  } else {
+    rs.type('text');
+    rs.status(400);
+    rs.send('inccorect login information');
+  }
+  await db.close();
+});
 // app.get('/yipper/user/:user', async (req, res) => {
 //   let db = await getDBConnection();
 //   let name = req.params["user"];

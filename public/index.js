@@ -7,6 +7,7 @@
  */
 "use strict";
 (function() {
+  let userID = null;
   window.addEventListener("load", init);
 
 
@@ -16,9 +17,42 @@
    */
   function init() {
     makeRequest();
-    // id('search-term').addEventListener('input', search);
-    // id('home-btn').addEventListener('click', homeButton);
-    // like();
+    id('list').addEventListener('click', checkGrid);
+    id('login').addEventListener('click', loginPage);
+  }
+
+  function loginPage() {
+    id('products').classList.add('hidden');
+    id('container3').classList.remove('hidden');
+    id('submit').addEventListener('click', login);
+
+  }
+
+  function login() {
+    let user = id('username').value;
+    let password = id('password').value;
+    let url = '/future/login';
+    let params = new FormData();
+    params.append("name", user);
+    params.append("password", password);
+    fetch(url, {method: "POST", body: params})
+      .then(statusCheck)
+      .then(resp => resp.json())
+      .then(processLoginData)
+      .catch(console.error);
+  }
+
+  function processLoginData(responseData) {
+    console.log(responseData);
+    if (responseData.length > 0){
+      id('user').classList.remove('hidden');
+      userID = responseData;
+      id("submit").removeEventListener("click", login);
+      id("submit").style.color = "gray";
+      qs('.container2 h1').textContent = "Successfully logged in clikc on back"
+      qs('.container2 h1').style.color = "green";
+    }
+
   }
 
   /**
@@ -40,16 +74,10 @@
    * @param {JSON} responseData -the api data of products
    */
   function processData(responseData) {
-
+    let productTotal = gen('div');
+    productTotal.classList.add('on');
+    productTotal.id = 'pet';
     for (let i = 0; i < responseData['Pets'].length; i++) {
-
-      // <section class="products">
-      // <div class="product">
-      //   <h2>Future Pet 1</h2>
-      //   <img>
-      //   <p class="price">$10.00</p>
-      //   <button id='add'>Add to Cart</button>
-      // </div>
       let product = gen('div');
       let word = gen('h1');
       let p1 = gen('p');
@@ -67,8 +95,20 @@
       product.appendChild(img);
       product.appendChild(p1);
       product.appendChild(button);
+      productTotal.appendChild(product);
+    }
+    id('products').appendChild(productTotal);
+  }
 
-      qs('.products').append(product)
+  function checkGrid() {
+    if (id('pet').classList.contains('add')) {
+      id('pet').classList.add('off');
+      id('pet').classList.remove('add');
+      id('pet').style.display = "block";
+    } else {
+      id('pet').classList.remove('off');
+      id('pet').classList.add('add');
+      id('pet').style.display = "";
     }
   }
 
@@ -83,6 +123,7 @@
     }
     return res;
   }
+
 
   /**
    * short function for get element by id

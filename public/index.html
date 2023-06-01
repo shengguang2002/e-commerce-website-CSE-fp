@@ -15,19 +15,32 @@
   </head>
   <body>
     <header>
+    <div class="layout">
+      <button id="list">change view</button>
+    </div>
       <nav>
         <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Products</a></li>
-          <li><a href="#">Cart</a></li>
+          <li><a id="home">Home</a></li>
+          <li><a id="login">login</a></li>
+          <li><a id="user" class='hidden'>account</a></li>
         </ul>
       </nav>
       <h1>AI Pet Store</h1>
     </header>
     <main>
-      <section class="products">
+      <section id="products">
 
       </section>
+      <section id="container3" class="hidden">
+        <button class="back-button">back</button>
+        <h1>Futuristic AI Pet Login</h1>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button type="submit" id="submit">Login</button>
+        </form>
+        <p id="status"></p>
+    </section>
     </main>
     <footer>
       <p>Final project: by Hanyang Yu & Brian Yuan</p>

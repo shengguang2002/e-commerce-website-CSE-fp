@@ -41,9 +41,13 @@ nav a {
 }
 
 /* Product grid styles */
-.products {
+#pet.on {
   display: flex;
   flex-wrap: wrap;
+  padding: 10px;
+}
+
+#pet.off {
   padding: 10px;
 }
 
@@ -98,7 +102,10 @@ h2 {
   margin-bottom: 10px;
 }
 
-/* Footer styles */
+.hidden {
+  display: none;
+}
+
 footer {
   background-color: #050505;
   color: #fff;
