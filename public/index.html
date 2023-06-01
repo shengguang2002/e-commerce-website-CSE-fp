@@ -19,18 +19,30 @@
       <button id="list">change view</button>
     </div>
       <nav>
+        <select id="search-select">
+          <option value="option1">Name</option>
+          <option value="option2">Seller</option>
+          <option value="option3">Region</option>
+        </select>
+        <input id='search-term' type='text'>
+        <button id='search-btn' disabled>search</button>
+        <div>
+          <button class="filter-button" id = "All">All</button>
+          <button class="filter-button" id = "Cat">Cat</button>
+          <button class="filter-button" id = "Dog">Dog</button>
+          <button class="filter-button" id = "50 lower">Lower than 50</button>
+        </div>
         <ul>
           <li><a id="home">Home</a></li>
-          <li><a id="login">login</a></li>
-          <li><a id="user" class='hidden'>account</a></li>
+          <li><a id="login">Login</a></li>
+          <li><a id="user" class='hidden'>Account</a></li>
         </ul>
       </nav>
       <h1>AI Pet Store</h1>
     </header>
     <main>
-      <section id="products">
+      <section id="products"></section>
 
-      </section>
       <section id="container3" class="hidden">
         <button class="back-button">back</button>
         <h1>Futuristic AI Pet Login</h1>
@@ -40,7 +52,11 @@
             <button type="submit" id="submit">Login</button>
         </form>
         <p id="status"></p>
-    </section>
+      </section>
+
+      <section id="user-page">
+        <button id = "history">Purchase History</button>
+      </section>
     </main>
     <footer>
       <p>Final project: by Hanyang Yu & Brian Yuan</p>

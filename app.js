@@ -10,6 +10,10 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(multer().none());
 
+const ERROR_CODE = 400;
+const SERVER_ERROR_CODE = 500;
+const PORT_NUM = 8000;
+
 async function getDBConnection() {
   const db = await sqlite.open({
       filename: 'finalProjectDatabase.db',
@@ -19,26 +23,42 @@ async function getDBConnection() {
 }
 
 app.get('/future/all', async (req, res) => {
-  let db = await getDBConnection();
-  let all = "select Name, Price from Aipets";
+  /*let db = await getDBConnection();
+  let all = "SELECT Name, Price FROM Aipets";
   let getAll = await db.all(all);
-  let text = {
+  /*let text = {
     "Pets":[
     ]
   }
   for (let i = 0; i < getAll.length; i++) {
     text["Pets"].push(getAll[i])
   }
-  res.type('json');
-  res.send(text);
-  await db.close();
+  res.type('json').json({"Pets": getAll});
+  await db.close();*/
+  try {
+    let db = await getDBConnection();
+    let query;
+    if (req.query.search) {
+      query = `SELECT PetID
+      FROM Aipets
+      WHERE Name
+      LIKE '%${req.query.search}%'
+      ORDER BY id`;
+    } else {
+      query = "SELECT Name, Price FROM Aipets";
+    }
+    let row = await db.all(query);
+    res.type('json').json({"Pets": row});
+  } catch (err) {
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
+  }
 });
 
 app.post('/future/login', async (rq, rs) => {
   let db = await getDBConnection();
   let user = rq.body.name;
   let password = rq.body.password;
-  let all = "SELECT userID FROM login where email = ? and digit = ?";
+  let all = "SELECT userID FROM login WHERE email = ? and digit = ?";
   let getAll = await db.all(all, [user, password]);
   if (getAll.length > 0) {
     rs.type('text');
@@ -50,6 +70,33 @@ app.post('/future/login', async (rq, rs) => {
   }
   await db.close();
 });
+
+
+/**
+ *
+ * @param {string} req - Express request object.
+ * @param {string} res - Express response object.
+ */
+app.post('/future/buy', async (req, res) => {
+  try {
+    if(req) {
+      if (!req.body.name || !req.body.seller|| !req.body.price) {
+        res.status(ERROR_CODE).send('Missing one or more of the required params.');
+        return;
+      }
+      let db = await getDBConnection();
+      let sql = `INSERT INTO Bought (name, seller, price, date)
+      VALUES (?, ?, ?, CURRENT_TIMESTAMP)`;
+      await db.run(sql, [req.body.name, req.body.seller, req.body.price]);
+    }
+    let row = await db.all(`SELECT *
+      FROM yips`);
+    res.type('json').json(row);
+  } catch (err) {
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
+  }
+});
+
 // app.get('/yipper/user/:user', async (req, res) => {
 //   let db = await getDBConnection();
 //   let name = req.params["user"];
@@ -104,5 +151,5 @@ app.post('/future/login', async (rq, rs) => {
 
 
 app.use(express.static('public'));
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || PORT_NUM;
 app.listen(PORT);
