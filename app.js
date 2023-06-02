@@ -71,6 +71,22 @@ app.post('/future/login', async (rq, rs) => {
   await db.close();
 });
 
+app.get('/future/info/:email/:digit', async (req, res) => {
+  let db = await getDBConnection();
+  let email = req.params["email"];
+  let digit = req.params["digit"];
+  if (email != '' || digit != '') {
+  let all = "INSERT INTO login(email, digit) values(?, ?)";
+  let getAll = await db.all(all, [email, digit]);
+  let result = "SELECT userID FROM login ORDER BY userID DESC LIMIT 1";
+  let getResult = await db.run(result);
+  res.type('json');
+  res.send(getResult);
+  } else {
+    res.status(400).send("Insertion failed");
+  }
+  await db.close();
+})
 
 /**
  *

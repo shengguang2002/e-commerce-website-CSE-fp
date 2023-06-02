@@ -19,10 +19,45 @@
     makeRequest();
     id('list').addEventListener('click', checkGrid);
     id('login').addEventListener('click', loginPage);
+    id('newuser').addEventListener('click', newUser);
     id('home').addEventListener('click', loginPage);
     id('search-term').addEventListener('input', searchTermInput);
     id('search-btn').addEventListener('click', searchBtnClicked);
     id('history').addEventListener('click', purchaseHistory);
+  }
+
+  function newUser() {
+    id('products').classList.add('hidden');
+    id('container3').classList.remove('hidden');
+    id('create').classList.remove('hidden');
+    id('create').addEventListener('click', create);
+
+  }
+
+  function create() {
+    let user = id('username').value;
+    let password = id('password').value;
+    let url = '/future/info/' + user + '/' + password
+    fetch(url)
+      .then(statusCheck)
+      .then(resp => resp.json())
+      .then(processCreateData)
+      .catch(console.error);
+  }
+
+  function processCreateData(responseData) {
+    console.log(responseData.changes);
+    if (responseData.changes > 0) {
+      id('user').classList.remove('hidden');
+      userID = responseData.lastID;
+      id("submits").removeEventListener("click", login);
+      id("submits").style.color = "gray";
+      qs('#container3 h1').textContent = "Successfully logged in click on back"
+      qs('#container3 h1').style.color = "green";
+      id('user').addEventListener('click', purchaseHistory);
+      id('create').classList.add('hidden');
+      id('newuser').classList.add('hidden');
+    }
   }
 
   async function purchaseHistory() {
