@@ -113,57 +113,22 @@ app.post('/future/buy', async (req, res) => {
   }
 });
 
-// app.get('/yipper/user/:user', async (req, res) => {
-//   let db = await getDBConnection();
-//   let name = req.params["user"];
-//   let all = "SELECT id, name, yip, hashtag, likes\
-//   , DATETIME(date) FROM yips where name = ? ORDER BY date DESC";
-//   let getAll = await db.all(all, [name]);
-//   if (getAll.length > 0) {
-//     res.type('json');
-//     res.send(getAll);
-//   } else {
-//     res.status(400).send("no name found");
-//   }
-//   await db.close();
-// })
-
-// app.post('/yipper/likes', async (rq, rs) => {
-//   let db = await getDBConnection();
-//   let id = rq.body.id;
-//   let all = "SELECT id, name, yip, hashtag, likes\
-//   , DATETIME(date) FROM yips where id = ? ORDER BY date DESC";
-//   let getAll = await db.all(all, [id]);
-//   console.log(getAll);
-//   if (getAll.length > 0) {
-//     let update = parseInt(getAll[0].likes) + 1
-//     await db.run("UPDATE yips SET likes = ? Where id = ?", [update, id]);
-
-//     rs.type('text');
-//     rs.send(update.toString());
-//   } else {
-//     rs.type('text');
-//     rs.status(400);
-//     rs.send('missing body param');
-//   }
-//   await db.close();
-// });
-
-// app.post('/yipper/new', async (rq, rs) => {
-//   let db = await getDBConnection();
-//   let name = rq.body.name;
-//   let full = rq.body.full;
-//   let yip = (full.split('#'))[0];
-//   let hashtag = (full.split('#'))[1];
-//   let all = "INSERT INTO yips(name, yip, hashtag, likes) values(?, ?, ?, 0)";
-//   let getAll = await db.all(all, [name, yip, hashtag]);
-//   let last = "SELECT id, name, yip, hashtag, likes, DATETIME(date)\
-//   FROM yips ORDER BY id DESC LIMIT 1";
-//   let get = await db.all(last);
-//   rs.type('json');
-//   rs.send(get);
-//   await db.close();
-// });
+app.get('/future/purchase-history/:user', async (req, res) => {
+  let db = await getDBConnection();
+  let user = req.params["user"];
+  if (user != '') {
+  let all = 'SELECT A.Name, A.Price, A.category \
+             FROM Bought \
+             JOIN AiPets AS A ON Bought.petID = A.PetID \
+             WHERE Bought.userID = ?;';
+  let getAll = await db.all(all, [user]);
+  res.type('json');
+  res.send(getAll);
+  } else {
+    res.status(400).send("Insertion failed");
+  }
+  await db.close();
+})
 
 
 app.use(express.static('public'));

@@ -57,6 +57,7 @@
       id('user').addEventListener('click', purchaseHistory);
       id('create').classList.add('hidden');
       id('newuser').classList.add('hidden');
+      getRecommendedProducts();
     }
   }
 
@@ -264,6 +265,38 @@
       id('pet').style.display = "";
     }
   }
+
+  function getRecommendedProducts() {
+    fetch(`/future/purchase-history/${userID}`)
+      .then(statusCheck)
+      .then(response => response.json())
+      .then(purchaseHistory => {
+        const recommendedProducts = generateRecommendations(purchaseHistory);
+        displayRecommendedProducts(recommendedProducts);
+      })
+      .catch(console.error);
+  }
+
+  function generateRecommendations(purchaseHistory) {
+    if (purchaseHistory.length === 0) {
+      return generateRandomRecommendations();
+    }
+    return generateRandomRecommendations();
+  }
+
+  function generateRandomRecommendations() {
+    const recommendedProducts = [];
+    for (let i = 0; i < 5; i++) {
+      const product = {
+        name: `Recommended Product ${i+1}`,
+        price: Math.floor(Math.random() * 100),
+        seller: `Seller ${i+1}`
+      };
+      recommendedProducts.push(product);
+    }
+    return recommendedProducts;
+  }
+
 
   /**
    * check the fecth call
