@@ -23,32 +23,27 @@ async function getDBConnection() {
 }
 
 app.get('/future/all', async (req, res) => {
-  /*let db = await getDBConnection();
-  let all = "SELECT Name, Price FROM Aipets";
-  let getAll = await db.all(all);
-  /*let text = {
-    "Pets":[
-    ]
-  }
-  for (let i = 0; i < getAll.length; i++) {
-    text["Pets"].push(getAll[i])
-  }
-  res.type('json').json({"Pets": getAll});
-  await db.close();*/
   try {
     let db = await getDBConnection();
-    let query;
-    if (req.query.search) {
-      query = `SELECT PetID
-      FROM Aipets
-      WHERE Name
-      LIKE '%${req.query.search}%'
-      ORDER BY id`;
-    } else {
-      query = "SELECT Name, Price FROM Aipets";
-    }
+    let query = "SELECT Name, Price, PetID FROM Aipets";
     let row = await db.all(query);
     res.type('json').json({"Pets": row});
+  } catch (err) {
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
+  }
+});
+
+app.post('/future/search', async (req, res) => {
+  try {
+    //console.log(req.body.search);
+    if(!req.body.search || !req.body.type) {
+      res.status(ERROR_CODE).send('Missing one or more of the required params.');
+      return;
+    }
+    let db = await getDBConnection();
+    let query = `SELECT PetID FROM AiPets WHERE ${req.body.type} LIKE '%${req.body.search}%'`;
+    let row = await db.all(query);
+    res.type('json').json(row);
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }

@@ -24,6 +24,44 @@
     id('search-term').addEventListener('input', searchTermInput);
     id('search-btn').addEventListener('click', searchBtnClicked);
     id('history').addEventListener('click', purchaseHistory);
+    id('all').addEventListener('click', filterClear);
+    id('cat').addEventListener('click', filterCategory("cat"));
+    id('dog').addEventListener('click', filterCategory("dog"));
+  }
+
+
+  async function filterCategory(type) {
+    try {
+      let newSearch = new FormData();
+      newSearch.append("search", type);
+      newSearch.append("type", "category");
+      let response = await fetch('/future/search', {method: 'POST', body: newSearch});
+      await statusCheck(response);
+      id('search-term').value = '';
+      let rows = await response.json();
+      let ids = [];
+      for (let row of rows) {
+        ids.push(row.PetID);
+      }
+      let pets = id('products').querySelectorAll('.product');
+      console.log(pets);
+      for (let pet of pets) {
+        if (!ids.includes(parseInt(pet.id))) {
+          pet.classList.add('hidden');
+        } else {
+          pet.classList.remove('hidden');
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function filterClear() {
+    let pets = id('products').querySelectorAll('.product');
+    for (let pet of pets) {
+      pet.classList.remove('hidden');
+    }
   }
 
   function newUser() {
@@ -76,7 +114,7 @@
         userArticle.appendChild(yipElement);
       }
     } catch (err) {
-      setError(true);
+      console.error(err);
     }
   }
 
@@ -87,11 +125,19 @@
    */
   async function searchBtnClicked() {
     try {
-      let response = await fetch(`/future/all?search=${id('search-term').value.trim()}`);
+      let newSearch = new FormData();
+      newSearch.append("search", id('search-term').value.trim());
+      newSearch.append("type", id('search-select').value);
+      let response = await fetch('/future/search', {method: 'POST', body: newSearch});
       await statusCheck(response);
+      id('search-term').value = '';
       let rows = await response.json();
-      let ids = rows.map(row => row.PetID);
-      let pets = id('products').querySelectorAll('.pet');
+      let ids = [];
+      for (let row of rows) {
+        ids.push(row.PetID);
+      }
+      let pets = id('products').querySelectorAll('.product');
+      console.log(pets);
       for (let pet of pets) {
         if (!ids.includes(parseInt(pet.id))) {
           pet.classList.add('hidden');
@@ -100,26 +146,7 @@
         }
       }
     } catch (err) {
-      setError(true);
-    }
-  }
-
-  async function filterActivated() {
-    try {
-      let response = await fetch(`/future/all?search=${this.textContent.value.trim()}`);
-      await statusCheck(response);
-      let rows = await response.json();
-      let ids = rows.map(row => row.id);
-      let cards = id('home').querySelectorAll('.card');
-      for (let card of cards) {
-        if (!ids.includes(parseInt(card.id))) {
-          card.classList.add('hidden');
-        } else {
-          card.classList.remove('hidden');
-        }
-      }
-    } catch (err) {
-      setError(true);
+      console.error(err);
     }
   }
 
@@ -226,8 +253,8 @@
       button.addEventListener('click', async () => {
         let newBuy = new FormData();
         newBuy.append("name", responseData['Pets'][i].Name);
-        newBuy.append("seller", "HanyangYu");
         newBuy.append("price", responseData['Pets'][i].Price);
+        newBuy.append("category", responseData['Pets'][i].category);
         let response = await fetch('/future/buy', {method: 'POST', body: newBuy});
         await statusCheck(response);
       });
@@ -254,16 +281,20 @@
     qs('.product-price').textContent = '$' + price;
   }
 
+  //这是干啥用的？
   function checkGrid() {
-    if (id('pet').classList.contains('add')) {
-      id('pet').classList.add('off');
-      id('pet').classList.remove('add');
-      id('pet').style.display = "block";
-    } else {
-      id('pet').classList.remove('off');
-      id('pet').classList.add('add');
-      id('pet').style.display = "";
-    }
+    let pets = id('home').querySelectorAll('.pet');
+      for (let pet of pets) {
+        if (id('pet').classList.contains('add')) {
+          id('pet').classList.add('off');
+          id('pet').classList.remove('add');
+          id('pet').style.display = "block";
+        } else {
+          id('pet').classList.remove('off');
+          id('pet').classList.add('add');
+          id('pet').style.display = "";
+        }
+      }
   }
 
   function getRecommendedProducts() {
