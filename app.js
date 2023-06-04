@@ -16,7 +16,7 @@ const PORT_NUM = 8000;
 
 async function getDBConnection() {
   const db = await sqlite.open({
-      filename: 'finalProjectDatabase.db',
+      filename: 'finalprojectdatabase.db',
       driver: sqlite3.Database
   });
   return db;
