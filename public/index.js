@@ -115,25 +115,26 @@
   async function purchaseHistory() {
     if(!userID) {
       console.log("login first!");
-    }
-    try {
-      let response = await fetch('/future/purchasehistory');
-      await statusCheck(response);
-      let rows = await response.json();
-      qs('#purchase-history h2').textContent = `Purchase History for `+ userEmail;
-      id('products').classList.add('hidden');
-      id('container3').classList.add('hidden');
-      id('container2').classList.add('hidden');
-      id('purchase-history').classList.remove('hidden');
-      qs('#purchase-history article').innerHTML = "";
-      for (let i = 0; i < rows.length; i++) {
-        let historyElement = gen('p');
-        historyElement.textContent = `Transaction #${i + 1}: Buy pet id :${rows[i].petID}
-        with $${rows[i].price}   ${new Date(rows[i].date).toLocaleString()}`;
-        qs('#purchase-history article').appendChild(historyElement);
+    } else {
+      try {
+        let response = await fetch(`/future/purchasehistory?userID=${userID}`);
+        await statusCheck(response);
+        let rows = await response.json();
+        qs('#purchase-history h2').textContent = `Purchase History for `+ userEmail;
+        id('products').classList.add('hidden');
+        id('container3').classList.add('hidden');
+        id('container2').classList.add('hidden');
+        id('purchase-history').classList.remove('hidden');
+        qs('#purchase-history article').innerHTML = "";
+        for (let i = 0; i < rows.length; i++) {
+          let historyElement = gen('p');
+          historyElement.textContent = `Transaction #${i + 1}: Buy pet id :${rows[i].petID}
+          with $${rows[i].price}   ${new Date(rows[i].date).toLocaleString()}`;
+          qs('#purchase-history article').appendChild(historyElement);
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
     }
   }
 

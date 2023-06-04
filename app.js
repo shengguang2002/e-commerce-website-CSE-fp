@@ -108,9 +108,14 @@ app.post('/future/buy', async (req, res) => {
 
 app.get('/future/purchasehistory', async (req, res) => {
   try {
+    if(!req.query.userID) {
+      res.status(ERROR_CODE).send('Missing one or more of the required params.');
+      return;
+    }
+    let id = req.query.userID;
     let db = await getDBConnection();
-    let query = "SELECT userID, price, petID, date FROM purchase";
-    let row = await db.all(query);
+    let query = `SELECT userID, price, petID, date FROM purchase WHERE userID = ?`;
+    let row = await db.all(query, [id]);
     res.type('json').json(row);
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
