@@ -92,12 +92,16 @@ h2 {
   padding: 10px 20px;
 }
 
+.description {
+  color: #4adeff;
+}
+
 .product button:hover {
   border: 1px solid #2c3e50;
   color: red;
 }
 
-.price {
+.price, #product-price {
   font-size: 24px;
   color: #00ff88;
   margin-bottom: 10px;
@@ -131,8 +135,7 @@ h2 {
   width: 50%;
 }
 
-#username,
-#password {
+#username, #password {
   padding: 10px;
   margin-bottom: 10px;
   border: none;
@@ -167,12 +170,11 @@ button:hover {
   padding: 20px;
 }
 
-
-.product-image {
+#product-image {
   text-align: center;
 }
 
-.product-image img {
+#product-image img {
   max-width: 300px;
 }
 
@@ -181,10 +183,9 @@ button:hover {
   text-align: center;
 }
 
-.product-price {
+#seller-info {
   font-size: 24px;
-  color: #00ff88;
-  margin-bottom: 10px;
+  color: #ff4c4c;
 }
 
 .product-description {
@@ -235,6 +236,9 @@ button:hover {
   color: #fff;
 }
 
+#purchase-history p {
+  color: #fff;
+}
 
 footer {
   background-color: #050505;

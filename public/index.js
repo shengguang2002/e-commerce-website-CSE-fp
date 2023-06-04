@@ -25,12 +25,23 @@
     id('search-btn').addEventListener('click', searchBtnClicked);
     id('history').addEventListener('click', purchaseHistory);
     id('all').addEventListener('click', filterClear);
-    id('cat').addEventListener('click', filterCategory("cat"));
-    id('dog').addEventListener('click', filterCategory("dog"));
+    id('cat').addEventListener('click', () => filterCategory("cat"));
+    id('dog').addEventListener('click', () => filterCategory("dog"));
+    id('back-button2').addEventListener('click', backToMain);
+    id('back-button3').addEventListener('click', backToMain);
   }
 
+  function filterCategory(type) {
+    console.log(type);
+    if(id('products').classList.contains(type)) {
+      id('products').classList.remove(type);
+      filterClear();
+    } else {
+      filterChecked(type);
+    }
+  }
 
-  async function filterCategory(type) {
+  async function filterChecked(type) {
     try {
       let newSearch = new FormData();
       newSearch.append("search", type);
@@ -52,6 +63,7 @@
           pet.classList.remove('hidden');
         }
       }
+      id('products').classList.add(type);
     } catch (err) {
       console.error(err);
     }
@@ -87,6 +99,7 @@
     console.log(responseData.changes);
     if (responseData.changes > 0) {
       id('user').classList.remove('hidden');
+      id('newuser').classList.add('hidden');
       userID = responseData.lastID;
       id("submits").removeEventListener("click", login);
       id("submits").style.color = "gray";
@@ -95,23 +108,29 @@
       id('user').addEventListener('click', purchaseHistory);
       id('create').classList.add('hidden');
       id('newuser').classList.add('hidden');
-      getRecommendedProducts();
+      //getRecommendedProducts();
     }
   }
 
   async function purchaseHistory() {
+    if(!userID) {
+      console.log("login first!");
+    }
     try {
-      let response = await fetch(`/future/buy`);
+      let response = await fetch('/future/purchasehistory');
       await statusCheck(response);
       let rows = await response.json();
-      let historyArticle = gen('article');
-      let userHeader = gen('h1');
-      userHeader.textContent = `Purchase History`;
-      historyArticle.appendChild(userHeader);
+      qs('#purchase-history h2').textContent = `Purchase History for `+ userEmail;
+      id('products').classList.add('hidden');
+      id('container3').classList.add('hidden');
+      id('container2').classList.add('hidden');
+      id('purchase-history').classList.remove('hidden');
+      qs('#purchase-history article').innerHTML = "";
       for (let i = 0; i < rows.length; i++) {
         let historyElement = gen('p');
-        historyElement.textContent = `Transaction #${i + 1}: Buy${rows[i].name} from #${rows[i].seller} with $${rows[i].price}`;
-        userArticle.appendChild(yipElement);
+        historyElement.textContent = `Transaction #${i + 1}: Buy pet id :${rows[i].petID}
+        with $${rows[i].price}   ${new Date(rows[i].date).toLocaleString()}`;
+        qs('#purchase-history article').appendChild(historyElement);
       }
     } catch (err) {
       console.error(err);
@@ -162,7 +181,6 @@
     id('products').classList.add('hidden');
     id('container3').classList.remove('hidden');
     id('submits').addEventListener('click', login);
-    qs('.back-button').addEventListener('click', backToMain);
     console.log('hi');
   }
 
@@ -170,6 +188,8 @@
     console.log("retirn");
     id('products').classList.remove('hidden');
     id('container3').classList.add('hidden');
+    id('container2').classList.add('hidden');
+    id('purchase-history').classList.add('hidden');
   }
 
   function login() {
@@ -193,6 +213,7 @@
     console.log(responseData);
     if (responseData.length > 0){
       id('user').classList.remove('hidden');
+      id('newuser').classList.add('hidden');
       userID = responseData[0].userID;
       id("submits").removeEventListener("click", login);
       id("submits").style.color = "gray";
@@ -235,50 +256,63 @@
       let product = gen('div');
       let word = gen('h1');
       let p1 = gen('p');
-      let button = gen('button');
-      let button2 = gen('button');
+      let p2 = gen('p');
+      let p3 = gen('p');
+      let sellButton = gen('button');
+      let viewButton = gen('button');
       let img = gen('img');
       let result = 'Future_PETS/' + responseData['Pets'][i].Name + '.jpg';
       word.textContent = responseData['Pets'][i].Name;
       img.src = result;
       product.classList.add('product');
       p1.classList.add('price');
-      button2.id = 'view';
-      button2.textContent = 'view item';
-      button2.para = responseData['Pets'][i].Name;
-      button2.paras = responseData['Pets'][i].Price;
-      button2.addEventListener('click', viewItem);
-      button.id = 'add';
-      button.textContent ='Add to Cart';
-      button.addEventListener('click', async () => {
-        let newBuy = new FormData();
-        newBuy.append("name", responseData['Pets'][i].Name);
-        newBuy.append("price", responseData['Pets'][i].Price);
-        newBuy.append("category", responseData['Pets'][i].category);
-        let response = await fetch('/future/buy', {method: 'POST', body: newBuy});
-        await statusCheck(response);
+      p2.classList.add('description');
+      p3.classList.add('description');
+      viewButton.id = 'view';
+      viewButton.textContent = 'view item';
+      viewButton.addEventListener('click', () => viewItem(responseData['Pets'][i]));
+      sellButton.id = 'add';
+      sellButton.textContent ='Buy Now!';
+      sellButton.addEventListener('click', async () => {
+        if(userID) {
+          console.log("selling!!");
+          let newBuy = new FormData();
+          newBuy.append("userID", userID);
+          newBuy.append("price", responseData['Pets'][i].Price);
+          newBuy.append("petID", responseData['Pets'][i].PetID);
+          await fetch('/future/buy', {method: 'POST', body: newBuy});
+        } else {
+          console.log("login first!");
+        }
       });
       p1.textContent = "$" + responseData['Pets'][i].Price;
+      p2.textContent = "Seller: " + responseData['Pets'][i].seller;
+      p3.textContent = "From: " + responseData['Pets'][i].region;
       product.appendChild(word);
       product.appendChild(img);
+      product.appendChild(p2);
+      product.appendChild(p3);
       product.appendChild(p1);
-      product.appendChild(button2);
-      product.appendChild(button);
+      product.appendChild(viewButton);
+      product.appendChild(sellButton);
       product.id = responseData['Pets'][i].PetID;
       productTotal.appendChild(product);
     }
     id('products').appendChild(productTotal);
   }
 
-  function viewItem(parameter) {
-    console.log('hi');
+  function viewItem(para) {
+    console.log(para);
     id('products').classList.add('hidden');
     id('container2').classList.remove('hidden');
-    let name = parameter.currentTarget.para;
-    let price = parameter.currentTarget.paras;
+    let name = para.Name;
     let result = 'Future_PETS/' + name + '.jpg';
-    qs('.product-image img').src =result;
-    qs('.product-price').textContent = '$' + price;
+    let price = para.Price;
+    qs('#product-image img').src ='Future_PETS/' + para.Name + '.jpg';
+    id('product-price').textContent = '$' + para.Price;
+    id('seller-info').textContent='Sold by ' + para.seller
+    + ", and Shiped from " + para.region;
+    qs('#container2 h1').textContent = "AiPets: " + para.Name + " (" + para.category + ")";
   }
 
   //这是干啥用的？

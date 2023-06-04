@@ -25,7 +25,7 @@ async function getDBConnection() {
 app.get('/future/all', async (req, res) => {
   try {
     let db = await getDBConnection();
-    let query = "SELECT Name, Price, PetID FROM Aipets";
+    let query = "SELECT Name, Price, PetID, seller, region, category FROM Aipets";
     let row = await db.all(query);
     res.type('json').json({"Pets": row});
   } catch (err) {
@@ -71,14 +71,14 @@ app.get('/future/info/:email/:digit', async (req, res) => {
   let email = req.params["email"];
   let digit = req.params["digit"];
   if (email != '' || digit != '') {
-  let all = "INSERT INTO login(email, digit) values(?, ?)";
+  let all = "INSERT INTO login (email, digit) VALUES (?, ?)";
   let getAll = await db.all(all, [email, digit]);
   let result = "SELECT userID FROM login ORDER BY userID DESC LIMIT 1";
   let getResult = await db.run(result);
   res.type('json');
   res.send(getResult);
   } else {
-    res.status(400).send("Insertion failed");
+    res.status(SERVER_ERROR_CODE).send("Insertion failed");
   }
   await db.close();
 })
@@ -90,25 +90,35 @@ app.get('/future/info/:email/:digit', async (req, res) => {
  */
 app.post('/future/buy', async (req, res) => {
   try {
-    if(req) {
-      if (!req.body.name || !req.body.seller|| !req.body.price) {
-        res.status(ERROR_CODE).send('Missing one or more of the required params.');
-        return;
-      }
-      let db = await getDBConnection();
-      let sql = `INSERT INTO Bought (name, seller, price, date)
-      VALUES (?, ?, ?, CURRENT_TIMESTAMP)`;
-      await db.run(sql, [req.body.name, req.body.seller, req.body.price]);
+    if (!req.body.userID || !req.body.price) {
+      res.status(ERROR_CODE).send('Missing one or more of the required params.');
+      return;
     }
-    let row = await db.all(`SELECT *
-      FROM yips`);
+    let db = await getDBConnection();
+    console.log("check");
+    let sql = `INSERT INTO purchase (userID, price, petID, date)
+    VALUES (?, ?, ?, CURRENT_TIMESTAMP)`;
+    console.log("check1");
+    await db.run(sql, [req.body.userID, req.body.price, req.body.petID]);
+    console.log("check12");
+  } catch (err) {
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
+  }
+});
+
+app.get('/future/purchasehistory', async (req, res) => {
+  try {
+    let db = await getDBConnection();
+    let query = "SELECT userID, price, petID, date FROM purchase";
+    let row = await db.all(query);
     res.type('json').json(row);
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
 });
 
-app.get('/future/purchase-history/:user', async (req, res) => {
+//先注释掉了，感觉需要重写
+/*app.get('/future/purchase-history/:user', async (req, res) => {
   let db = await getDBConnection();
   let user = req.params["user"];
   if (user != '') {
@@ -123,7 +133,7 @@ app.get('/future/purchase-history/:user', async (req, res) => {
     res.status(400).send("Insertion failed");
   }
   await db.close();
-})
+})*/
 
 
 app.use(express.static('public'));
