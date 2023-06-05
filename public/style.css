@@ -170,6 +170,11 @@ button:hover {
   padding: 20px;
 }
 
+#Recproducts {
+  text-align: center;
+  color: #f6eeee;
+}
+
 #product-image {
   text-align: center;
 }

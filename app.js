@@ -25,7 +25,7 @@ async function getDBConnection() {
 app.get('/future/all', async (req, res) => {
   try {
     let db = await getDBConnection();
-    let query = "SELECT Name, Price, PetID, seller, region, category FROM Aipets";
+    let query = "SELECT Name, Price, PetID, seller, region, category FROM Alpets";
     let row = await db.all(query);
     res.type('json').json({"Pets": row});
   } catch (err) {
@@ -41,7 +41,7 @@ app.post('/future/search', async (req, res) => {
       return;
     }
     let db = await getDBConnection();
-    let query = `SELECT PetID FROM AiPets WHERE ${req.body.type} LIKE '%${req.body.search}%'`;
+    let query = `SELECT PetID FROM AlPets WHERE ${req.body.type} LIKE '%${req.body.search}%'`;
     let row = await db.all(query);
     res.type('json').json(row);
   } catch (err) {
@@ -83,6 +83,7 @@ app.get('/future/info/:email/:digit', async (req, res) => {
   await db.close();
 })
 
+
 /**
  *
  * @param {string} req - Express request object.
@@ -122,23 +123,43 @@ app.get('/future/purchasehistory', async (req, res) => {
   }
 });
 
-//先注释掉了，感觉需要重写
-/*app.get('/future/purchase-history/:user', async (req, res) => {
+
+app.get('/future/rec/:user', async (req, res) => {
   let db = await getDBConnection();
   let user = req.params["user"];
   if (user != '') {
-  let all = 'SELECT A.Name, A.Price, A.category \
-             FROM Bought \
-             JOIN AiPets AS A ON Bought.petID = A.PetID \
-             WHERE Bought.userID = ?;';
-  let getAll = await db.all(all, [user]);
-  res.type('json');
-  res.send(getAll);
+    let all = 'SELECT A.Name, A.Price, A.category, \
+                (SELECT MAX(PetID) FROM AlPets) AS LastPetID \
+                FROM purchase \
+                JOIN AlPets AS A ON purchase.petID = A.PetID \
+                WHERE purchase.userID = ?;';
+    let getAll = await db.all(all, [user]);
+    res.type('json');
+    res.send(getAll);
   } else {
-    res.status(400).send("Insertion failed");
+    res.status(400).send("failed");
   }
   await db.close();
-})*/
+})
+
+app.post('/future/get', async (req, res) => {
+  try {
+    if(!req.body.petID) {
+      res.status(ERROR_CODE).send('Missing one or more of the required params.');
+      return;
+    }
+    let db = await getDBConnection();
+    let all = 'SELECT Name, Price, category, \
+    (SELECT MAX(PetID) FROM AlPets) AS LastPetID \
+    FROM AlPets \
+    WHERE PetID = ?';
+    let row = await db.all(all, [req.body.petID]);
+    res.type('json');
+    res.send(row);
+  } catch (err) {
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
+  }
+})
 
 
 app.use(express.static('public'));

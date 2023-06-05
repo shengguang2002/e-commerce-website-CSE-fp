@@ -7,7 +7,7 @@
  */
 "use strict";
 (function() {
-  let userID = null;
+  let userID = 121;
   let userEmail = null;
   window.addEventListener("load", init);
 
@@ -29,6 +29,7 @@
     id('dog').addEventListener('click', () => filterCategory("dog"));
     id('back-button2').addEventListener('click', backToMain);
     id('back-button3').addEventListener('click', backToMain);
+    getRecommendedProducts();
   }
 
   function filterCategory(type) {
@@ -108,7 +109,8 @@
       id('user').addEventListener('click', purchaseHistory);
       id('create').classList.add('hidden');
       id('newuser').classList.add('hidden');
-      //getRecommendedProducts();
+      getRecommendedProducts();
+      id('Recproducts').classList.remove('hidden');
     }
   }
 
@@ -209,7 +211,7 @@
       .catch(console.error);
   }
 
-  //这个真的可以进去嘛
+
   function processLoginData(responseData) {
     console.log(responseData);
     if (responseData.length > 0){
@@ -223,6 +225,8 @@
       id('user').addEventListener('click', purchaseHistory);
       id('save').classList.remove('hidden');
       id('save').addEventListener('click', save);
+      getRecommendedProducts();
+      id('Recproducts').classList.remove('hidden');
     }
   }
 
@@ -316,7 +320,7 @@
     qs('#container2 h1').textContent = "AiPets: " + para.Name + " (" + para.category + ")";
   }
 
-  //这是干啥用的？
+
   function checkGrid() {
     let pets = id('home').querySelectorAll('.pet');
       for (let pet of pets) {
@@ -333,34 +337,84 @@
   }
 
   function getRecommendedProducts() {
-    fetch(`/future/purchase-history/${userID}`)
+    fetch(`/future/rec/${userID}`)
       .then(statusCheck)
       .then(response => response.json())
       .then(purchaseHistory => {
-        const recommendedProducts = generateRecommendations(purchaseHistory);
-        displayRecommendedProducts(recommendedProducts);
+        generateRecommendations(purchaseHistory);
       })
       .catch(console.error);
   }
 
   function generateRecommendations(purchaseHistory) {
     if (purchaseHistory.length === 0) {
-      return generateRandomRecommendations();
+      let randomID = Math.floor(Math.random() * 10) + 1;
+      getApendRec(randomID)
+        .then(detail => {
+          append(detail);
+        });
+    } else {
+      let dog = 0;
+      let cat = 0;
+      let random = Math.floor(Math.random() * purchaseHistory[0].LastPetID) + 1;
+      console.log(random);
+      for (let i = 0; i < purchaseHistory.length; i++) {
+        if (purchaseHistory[i].category === 'dog') {
+          dog += 1;
+        } else {
+          cat += 1;
+        }
+      }
+      if (dog > cat) {
+        let detail;
+        const fetchRandomPet = () => {
+          random = Math.floor(Math.random() * purchaseHistory[0].LastPetID) + 1;
+          return getApendRec(random)
+            .then(data => {
+              detail = data;
+              if (detail[0].category !== 'dog') {
+                return fetchRandomPet();
+              }
+              return detail;
+            });
+        };
+        fetchRandomPet()
+          .then(detail => {
+            append(detail);
+          });
+      }
+       else {
+        getApendRec(randomID)
+        .then(detail => {
+          append(detail);
+        });
+      }
     }
-    return generateRandomRecommendations();
   }
 
-  function generateRandomRecommendations() {
-    const recommendedProducts = [];
-    for (let i = 0; i < 5; i++) {
-      const product = {
-        name: `Recommended Product ${i+1}`,
-        price: Math.floor(Math.random() * 100),
-        seller: `Seller ${i+1}`
-      };
-      recommendedProducts.push(product);
-    }
-    return recommendedProducts;
+  function getApendRec(ID) {
+    let randomID = new FormData();
+    randomID.append("petID", ID);
+    return fetch('/future/get', { method: 'POST', body: randomID })
+      .then(statusCheck)
+      .then(response => response.json())
+      .then(purchaseHistory => {
+        return purchaseHistory;
+      })
+      .catch(console.error);
+  }
+
+  function append(responseData) {
+    let product = gen('div');
+    let word = gen('h1');
+    let img = gen('img');
+    let result = 'Future_PETS/' + responseData[0].Name + '.jpg';
+    img.src = result;
+    word.textContent = responseData[0].Name;
+    product.appendChild(word);
+    product.appendChild(img);
+    product.classList.add('product');
+    id('Recproducts').appendChild(product);
   }
 
 
