@@ -246,6 +246,7 @@
     console.log("retirn");
     id('products').classList.remove('hidden');
     id('container3').classList.add('hidden');
+    id('recommend-production').classList.add('hidden');
     id('container2').classList.add('hidden');
     id('purchase-history').classList.add('hidden');
   }
