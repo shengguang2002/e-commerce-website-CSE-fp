@@ -21,7 +21,7 @@ Example Response:
 {
   "Pets": [
     {
-      "Name": "DD",
+      "Name": "dd",
       "Price": 50,
       "PetID": 1,
       "seller": "Brian",
@@ -29,7 +29,7 @@ Example Response:
       "category": "Cat"
     },
     {
-      "Name": "WIW",
+      "Name": "wiw",
       "Price": 75,
       "PetID": 2,
       "seller": "Brian",
@@ -201,13 +201,13 @@ Example Response:
 ```json
 [
   {
-    "Name": "UI",
+    "Name": "ui",
     "Price": 50,
     "category": "Cat",
     "LastPetID": 10
   },
   {
-    "Name": "IU",
+    "Name": "iu",
     "Price": 75,
     "category": "Dog",
     "LastPetID": 10
@@ -238,7 +238,7 @@ Example Response:
 ```json
 [
   {
-    "Name": "BB",
+    "Name": "bb",
     "Price": 50,
     "category": "Cat",
     "LastPetID": 10

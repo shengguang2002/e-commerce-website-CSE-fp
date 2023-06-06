@@ -3,7 +3,10 @@
  * Date: May 6, 2023
  * Section: CSE 154 AF
  *
- * This is the JS to implement the UI for online shopping.
+ * This is the JS to implement the UI for online shopping M278 AI Pet Store, an ecommerce-website.
+ * It provides JS code that serves functions of searching, filtering, buying AI pets, showing AI
+ * pets, providing purchase history, log in and sign up, and giving recommending pets based on
+ * your purchase history
  */
 "use strict";
 (function() {
@@ -337,7 +340,7 @@
       let sellButton = gen('button');
       let viewButton = gen('button');
       let img = gen('img');
-      let result = 'Future_PETS/' + responseData['Pets'][i].Name + '.jpg';
+      let result = 'img/' + responseData['Pets'][i].Name + '.jpg';
       word.textContent = responseData['Pets'][i].Name;
       img.src = result;
       img.alt = "picture of " + responseData['Pets'][i].Name;
@@ -387,9 +390,9 @@
     id('products').classList.add('hidden');
     id('container2').classList.remove('hidden');
     let name = para.Name;
-    let result = 'Future_PETS/' + name + '.jpg';
+    let result = 'img/' + name + '.jpg';
     let price = para.Price;
-    qs('#product-image img').src ='Future_PETS/' + para.Name + '.jpg';
+    qs('#product-image img').src ='img/' + para.Name + '.jpg';
     id('product-price').textContent = '$' + para.Price;
     id('seller-info').textContent='Sold by ' + para.seller
     + ", and Shiped from " + para.region;
@@ -507,7 +510,7 @@
     let product = gen('div');
     let word = gen('h1');
     let img = gen('img');
-    let result = 'Future_PETS/' + responseData[0].Name + '.jpg';
+    let result = 'img/' + responseData[0].Name + '.jpg';
     img.src = result;
     word.textContent = responseData[0].Name;
     product.appendChild(word);
@@ -555,14 +558,5 @@
    */
     function qs(selector) {
       return document.querySelector(selector);
-    }
-
-    /**
-     * short function for querySelectorAll
-     * @param {string} selector -the element string
-     * @returns {Element} - the element
-     */
-    function qsa(selector) {
-      return document.querySelectorAll(selector);
     }
 })();

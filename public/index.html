@@ -3,7 +3,9 @@
   Date: May 7, 2023
   Section: CSE 154
   This is the index.html page for final Project.
-  It includes a beggining version of a onlin shopping
+  It includes a beggining version of a onlin shopping M278 AI Pet Store, an ecommerce-website.
+ * It provides different viewpoint for log in and sign up, getting information of AI pets, and
+ * enabling user to buy and check purchase history.
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -17,9 +19,9 @@
   </head>
   <body>
     <header>
-      <div class="layout">
+      <article class="layout">
         <button id="list">change view</button>
-      </div>
+      </article>
       <nav>
         <select id="search-select">
           <option value="name">Name</option>
@@ -28,11 +30,11 @@
         </select>
         <input id='search-term' type='text'>
         <button id='search-btn' disabled>search</button>
-        <div>
+        <article>
           <button class="filter-button" id= "all">All</button>
           <button class="filter-button" id= "cat">Cat</button>
           <button class="filter-button" id= "dog">Dog</button>
-        </div>
+        </article>
         <ul>
           <li><a id="home">Home</a></li>
           <li><a id="login">Login</a></li>
@@ -51,13 +53,13 @@
       <section id="container3" class="hidden">
         <button id="back-button3">back</button>
         <h1> M278 Pet Login</h1>
-        <div id='form'>
+        <article id='form'>
           <input type="text" id="username" >
           <input type="password" id="password">
           <button id="submits">Login</button>
           <button id="create" class="hidden">create the account</button>
           <button id="save" class="hidden">Save login info</button>
-        </div>
+        </article>
         <p id="status"></p>
       </section>
 
@@ -66,38 +68,37 @@
         <h1>M278 Pet</h1>
 
         <article id="product-image">
-          <img src="Future_PETS/ava.jpg" alt="M278 Pet">
+          <img src="img/ava.jpg" alt="M278 Pet">
         </article>
 
-        <div class="product-details">
+        <section class="product-details">
           <p id="seller-info"></p>
-          <div id="product-price">$199.99</div>
-          <div class="product-description">
+          <p id="product-price">$199.99</p>
+          <p id="product-description">
             Meet the M278 Pet, your futuristic companion.
             This advanced powered pet mimics the behavior
             of a real pet and comes with a pet like design.
-          </div>
+          </p>
 
-          <div class="product-buttons">
+          <article class="product-buttons">
             <button class="buy-button">Buy Now</button>
             <button class="add-to-cart-button">Add to Cart</button>
-          </div>
+          </article>
 
-          <div class="product-info">
-            <article>
-              <p>- Lifelike pet behavior simulation</p>
-              <p>- CyberPunk design</p>
-              <p>- Interactive voice commands</p>
-              <p> Built-in Machine learning capabilities</p>
-            </article>
-          </div>
+          <article class="product-info">
+            <p>Product information</p>
+            <p>- Lifelike pet behavior simulation</p>
+            <p>- CyberPunk design</p>
+            <p>- Interactive voice commands</p>
+            <p> Built-in Machine learning capabilities</p>
+          </article>
 
-          <div class="shipping-info">
+          <article class="shipping-info">
             <p>Shipping:</p>
             <p>- Free shipping within the US</p>
             <p>- International shipping available</p>
-          </div>
-        </div>
+          </article>
+        </section>
       </section>
 
       <section id="purchase-history" class='hidden'>
@@ -112,8 +113,7 @@
       </section>
     </main>
     <footer>
-      <p>Final project: by Hanyang Yu & Brian Yuan</p>
-      <cite><a href="https://picsart.com/ai-image-generator">PicsArt</a></cite>
+      <p>Final project: by Hanyang Yu and Brian Yuan</p>
     </footer>
   </body>
 </html>
