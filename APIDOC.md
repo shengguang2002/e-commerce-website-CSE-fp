@@ -11,12 +11,12 @@ The Future Pet API provides endpoints to retrieve information about available pe
 - **Request Format**: N/A
 - **Response Format**: JSON
 
-Example Request:
+**Example Request:**
 ```
 GET /all
 ```
 
-Example Response:
+**Example Response:**
 ```json
 {
   "Pets": [
@@ -41,6 +41,9 @@ Example Response:
 }
 ```
 
+**Error Handling:**
+Possible 500 (server error) SERVER_ERROR
+
 ## Search for Pets
 
 - **Endpoint**: `/search`
@@ -51,7 +54,7 @@ Example Response:
   - `type` (required): The type of search criteria (e.g., name, category).
 - **Response Format**: JSON
 
-Example Request:
+**Example Request:**
 ```
 POST /search
 Body:
@@ -61,7 +64,7 @@ Body:
 }
 ```
 
-Example Response:
+**Example Response:**
 ```json
 [
   {
@@ -73,6 +76,10 @@ Example Response:
 ]
 ```
 
+**Error Handling:**
+Possible 400 (invalid request) error if search or search type is not provided
+Possible 500 (server error) SERVER_ERROR
+
 ## User Login
 
 - **Endpoint**: `/login`
@@ -83,7 +90,7 @@ Example Response:
   - `password` (required): The user's password.
 - **Response Format**: Text
 
-Example Request:
+**Example Request:**
 ```
 POST /login
 Body:
@@ -93,10 +100,14 @@ Body:
 }
 ```
 
-Example Response:
+**Example Response:**
 ```
 [1]
 ```
+
+**Error Handling:**
+Possible 400 (invalid request) error if account is not founded
+Possible 500 (server error) SERVER_ERROR
 
 ## User Information
 
@@ -108,17 +119,21 @@ Example Response:
   - `digit` (required): The user's digit.
 - **Response Format**: JSON
 
-Example Request:
+**Example Request:**
 ```
 GET /info/moazzed@uneunu.lr/4952072
 ```
 
-Example Response:
+**Example Response:**
 ```json
 {
   "userID": 1
 }
 ```
+
+**Error Handling:**
+Possible 400 (invalid request) error if email or digit is not provided
+Possible 500 (server error) SERVER_ERROR
 
 ## Buy a Pet
 
@@ -131,7 +146,7 @@ Example Response:
   - `petID` (required): The ID of the pet being purchased.
 - **Response Format**: N/A
 
-Example Request:
+**Example Request:**
 ```
 POST /buy
 Body:
@@ -142,10 +157,14 @@ Body:
 }
 ```
 
-Example Response:
+**Example Response:**
 ```
 Status: 200 OK
 ```
+
+**Error Handling:**
+Possible 400 (invalid request) error if userID or price or petID is not provided
+Possible 500 (server error) SERVER_ERROR
 
 ## Purchase History
 
@@ -158,12 +177,12 @@ Status: 200 OK
   - `userID` (required): The user ID to retrieve the purchase history for.
 - **Response Format**: JSON
 
-Example Request:
+**Example Request:**
 ```
 GET /purchasehistory?userID=1
 ```
 
-Example Response:
+**Example Response:**
 ```json
 [
   {
@@ -182,6 +201,10 @@ Example Response:
 ]
 ```
 
+**Error Handling:**
+Possible 400 (invalid request) error if userID is not provided
+Possible 500 (server error) SERVER_ERROR
+
 ## User Recommendations
 
 - **Endpoint**: `/rec/:user`
@@ -192,12 +215,12 @@ Example Response:
   - `user` (required): The user ID to get recommendations for.
 - **Response Format**: JSON
 
-Example Request:
+**Example Request:**
 ```
 GET /rec/1
 ```
 
-Example Response:
+**Example Response:**
 ```json
 [
   {
@@ -216,6 +239,10 @@ Example Response:
 ]
 ```
 
+**Error Handling:**
+Possible 400 (invalid request) error if user is not provided
+Possible 500 (server error) SERVER_ERROR
+
 ## Get Pet Information
 
 - **Endpoint**: `/get`
@@ -225,7 +252,7 @@ Example Response:
   - `petID` (required): The ID of the pet to retrieve information for.
 - **Response Format**: JSON
 
-Example Request:
+**Example Request:**
 ```
 POST /get
 Body:
@@ -234,7 +261,7 @@ Body:
 }
 ```
 
-Example Response:
+**Example Response:**
 ```json
 [
   {
@@ -245,3 +272,6 @@ Example Response:
   }
 ]
 ```
+**Error Handling:**
+Possible 400 (invalid request) error if petID is not provided
+Possible 500 (server error) SERVER_ERROR

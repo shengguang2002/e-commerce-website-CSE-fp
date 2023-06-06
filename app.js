@@ -82,20 +82,24 @@ app.post('/future/search', async (req, res) => {
  * @param {string} res - Express response object.
  */
 app.post('/future/login', async (rq, rs) => {
-  let db = await getDBConnection();
-  let user = rq.body.name;
-  let password = rq.body.password;
-  let all = "SELECT userID FROM login WHERE email = ? and digit = ?";
-  let getAll = await db.all(all, [user, password]);
-  if (getAll.length > 0) {
-    rs.type('text');
-    rs.send(getAll);
-  } else {
-    rs.type('text');
-    rs.status(400);
-    rs.send('inccorect login information');
+  try {
+    let db = await getDBConnection();
+    let user = rq.body.name;
+    let password = rq.body.password;
+    let all = "SELECT userID FROM login WHERE email = ? and digit = ?";
+    let getAll = await db.all(all, [user, password]);
+    if (getAll.length > 0) {
+      rs.type('text');
+      rs.send(getAll);
+    } else {
+      rs.type('text');
+      rs.status(ERROR_CODE);
+      rs.send('incorrect login information');
+    }
+    await db.close();
+  } catch (error) {
+    res.status(SERVER_ERROR_CODE).send("Insertion failed");
   }
-  await db.close();
 });
 
 /**
@@ -105,21 +109,25 @@ app.post('/future/login', async (rq, rs) => {
  * @param {string} res - Express response object.
  */
 app.get('/future/info/:email/:digit', async (req, res) => {
-  let db = await getDBConnection();
-  let email = req.params["email"];
-  let digit = req.params["digit"];
-  if (email != '' || digit != '') {
-  let all = "INSERT INTO login (email, digit) VALUES (?, ?)";
-  let getAll = await db.all(all, [email, digit]);
-  let result = "SELECT userID FROM login ORDER BY userID DESC LIMIT 1";
-  let getResult = await db.run(result);
-  res.type('json');
-  res.send(getResult);
-  } else {
-    res.status(SERVER_ERROR_CODE).send("Insertion failed");
+  try {
+    let db = await getDBConnection();
+    let email = req.params["email"];
+    let digit = req.params["digit"];
+    if (email != '' || digit != '') {
+      let all = "INSERT INTO login (email, digit) VALUES (?, ?)";
+      let getAll = await db.all(all, [email, digit]);
+      let result = "SELECT userID FROM login ORDER BY userID DESC LIMIT 1";
+      let getResult = await db.run(result);
+      res.type('json');
+      res.send(getResult);
+    } else {
+      res.status(SERVER_ERROR_CODE).send("Insertion failed");
+    }
+    await db.close();
+  } catch (error) {
+    res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
-  await db.close();
-})
+});
 
 /**
  * Express route for "/future/buy" endpoint. Inserts a purchase record into the database.
@@ -129,7 +137,7 @@ app.get('/future/info/:email/:digit', async (req, res) => {
  */
 app.post('/future/buy', async (req, res) => {
   try {
-    if (!req.body.userID || !req.body.price) {
+    if (!req.body.userID || !req.body.price || !req.body.petID) {
       res.status(ERROR_CODE).send('Missing one or more of the required params.');
       return;
     }
@@ -174,22 +182,26 @@ app.get('/future/purchasehistory', async (req, res) => {
  * @param {string} res - Express response object.
  */
 app.get('/future/rec/:user', async (req, res) => {
-  let db = await getDBConnection();
-  let user = req.params["user"];
-  if (user != '') {
-    let all = 'SELECT A.Name, A.Price, A.category, \
-                (SELECT MAX(PetID) FROM AlPets) AS LastPetID \
-                FROM purchase \
-                JOIN AlPets AS A ON purchase.petID = A.PetID \
-                WHERE purchase.userID = ?;';
-    let getAll = await db.all(all, [user]);
-    res.type('json');
-    res.send(getAll);
-  } else {
-    res.status(400).send("failed");
+  try {
+    let db = await getDBConnection();
+    let user = req.params["user"];
+    if (user != '') {
+      let all = 'SELECT A.Name, A.Price, A.category, \
+                  (SELECT MAX(PetID) FROM AlPets) AS LastPetID \
+                  FROM purchase \
+                  JOIN AlPets AS A ON purchase.petID = A.PetID \
+                  WHERE purchase.userID = ?;';
+      let getAll = await db.all(all, [user]);
+      res.type('json');
+      res.send(getAll);
+    } else {
+      res.status(ERROR_CODE).send("failed");
+    }
+    await db.close();
+  } catch (error) {
+    res.status(SERVER_ERROR_CODE).send("An error occurred");
   }
-  await db.close();
-})
+});
 
 /**
  * Express route for "/future/get" endpoint. Fetches a pet's details.
