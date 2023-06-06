@@ -125,18 +125,18 @@
   }
 
   /**
-   * when a new account is sucessuflly created
-   * it will show the account page and disaply
-   * Successfully logged in click on back
-   * it will also incur the get recommended product on the home page
-   * The color of the submit button will change tp gray
-   * and The title will be green
-   * a user is then able to click on the account page tp view
-   * their purchase history by enable the account button.
-   * The craete button will then be hidden form user
-   * The userId will alos be updated to the global variable for
-   * future use
-   * @param {js object} responseData - form the craete account endpoint
+   * Processes the response from the create account endpoint.
+   *
+   * If a new account is successfully created, the function updates the user interface:
+   * - It displays the account page with the message "Successfully logged in click on back"
+   * - It triggers the loading of recommended products on the home page
+   * - The color of the submit button changes to gray and the title turns green
+   * - The 'account' button becomes enabled, allowing the user to view their purchase history
+   * - The 'create' button is hidden
+   *
+   * In addition, it updates the global userID variable with the lastID from the response data.
+   *
+   * @param {Object} responseData - The response from the create account endpoint, expected to include 'changes' and 'lastID' properties.
    */
   function processCreateData(responseData) {
     if (responseData.changes > 0) {
@@ -429,9 +429,7 @@
    * it switch the grid view when click on the button
    */
   function checkGrid() {
-    console.log("start");
     let pets = id('products').querySelectorAll('.product');
-    console.log(pets);
     for (let pet of pets) {
       if (pet.classList.contains('add')) {
         pet.classList.add('off');
@@ -440,7 +438,7 @@
       } else {
         pet.classList.remove('off');
         pet.classList.add('add');
-        pet.style.display = "";
+        pet.style.display = "grid";
       }
     }
   }
@@ -463,25 +461,24 @@
   /**
    * If user does have purchase history, then it will recommend a random
    * cat or dog pets based on the number of cat or dog pets user purchased.
-   * @param {Array} purchaseHistory - The purchase history of the user.
+   * @param {Array} buyHistory - The purchase history of the user.
    * @returns {string} - The pet category to recommend. If no history, returns null.
    */
-  function getRecommendationCategory(purchaseHistory) {
-    if (purchaseHistory.length === 0) {
+  function getRecommendationCategory(buyHistory) {
+    if (buyHistory.length === 0) {
       return null;
-    } else {
-      let dog = 0;
-      let cat = 0;
-
-      for (let i = 0; i < purchaseHistory.length; i++) {
-        if (purchaseHistory[i].category === 'dog') {
-          dog += 1;
-        } else {
-          cat += 1;
-        }
-      }
-      return dog > cat ? 'dog' : 'cat';
     }
+    let dog = 0;
+    let cat = 0;
+
+    for (let i = 0; i < buyHistory.length; i++) {
+      if (buyHistory[i].category === 'dog') {
+        dog += 1;
+      } else {
+        cat += 1;
+      }
+    }
+    return dog > cat ? 'dog' : 'cat';
   }
 
   /**
@@ -508,29 +505,30 @@
 
   /**
    * Generates a recommendation for the user based on their purchase history.
-   * @param {json} purchaseHistory - The purchase history of the user.
+   * @param {json} pastBought - The purchase history of the user.
    */
-  function generateRecommendations(purchaseHistory) {
-    let randomID = Math.floor(Math.random() * 10) + 1;
-    let category = getRecommendationCategory(purchaseHistory);
+  function generateRecommendations(pastBought) {
+    const DECIMAL = 10;
+    let randomID = Math.floor(Math.random() * DECIMAL) + 1;
+    let category = getRecommendationCategory(pastBought);
     if (category === null) {
       getApendRec(randomID)
         .then(detail => {
           append(detail);
         });
     } else {
-      fetchRandomPet(purchaseHistory[0].LastPetID, category)
+      fetchRandomPet(pastBought[0].LastPetID, category)
         .then(detail => {
           append(detail);
         });
     }
   }
 
-
   /**
    * Makes a POST request to the '/future/get' endpoint with a specified Pet ID.
    * @param {number} ID - The ID of the Pet to retrieve from the database.
-   * @returns {Promise<Object>} - A Promise that resolves to the Pet data retrieved from the database.
+   * @returns {Promise<Object>} - A Promise that resolves to the Pet data
+   * retrieved from the database.
    */
   async function getApendRec(ID) {
     try {

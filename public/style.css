@@ -53,6 +53,11 @@ nav a {
   padding: 10px;
 }
 
+.pet.add {
+  justify-items: center;
+  align-items: center;
+}
+
 h2 {
   color: #f3efef;
 }
