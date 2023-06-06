@@ -248,23 +248,34 @@
   }
 
   /**
-   * the login page call the login endpoint by insert username and password
-   * use post method. The api then return the information to processLoginData
-   * for future processing.
+   * Initiates the login process by sending a POST request to the login endpoint.
+   *
+   * The function gets the user's input for username and password, then sends a POST request
+   * to the login endpoint with the user's input as parameters. The received response
+   * is passed to the processLoginData function for further processing.
+   *
+   * @throws {Error} If an error occurs during fetching or processing the response.
    */
-  function login() {
-    let user = id('username').value;
-    let password = id('password').value;
-    let url = '/future/login';
-    let params = new FormData();
-    params.append("name", user);
-    params.append("password", password);
-    fetch(url, {method: "POST", body: params})
-      .then(statusCheck)
-      .then(resp => resp.json())
-      .then(processLoginData)
-      .catch(console.error);
+  async function login() {
+    try {
+      let user = id('username').value;
+      let password = id('password').value;
+      let url = '/future/login';
+      let params = new FormData();
+      params.append("name", user);
+      params.append("password", password);
+
+      let response = await fetch(url, {method: "POST", body: params});
+      let statusCheckedResponse = await statusCheck(response);
+      let jsonData = await statusCheckedResponse.json();
+
+      await processLoginData(jsonData);
+    } catch (err) {
+      console.error(err);
+      throw new Error('Failed to log in.');
+    }
   }
+
 
   /**
    * This funciton processed the loggged in information by
@@ -304,17 +315,29 @@
   }
 
   /**
-   * make request will generate all of the products availiable to
-   * purchase by check the status and call process data
+   * Fetches all available products for purchase.
+   *
+   * The function sends a GET request to the /future/all endpoint to retrieve all products.
+   * After checking the response status and converting the response to JSON, it passes the
+   * resulting data to the processData function for further handling.
+   *
+   * @throws {Error} If an error occurs during fetching or processing the response.
    */
-  function makeRequest() {
-    let url = '/future/all';
-    fetch(url)
-      .then(statusCheck)
-      .then(resp => resp.json())
-      .then(processData)
-      .catch(console.error);
+  async function makeRequest() {
+    try {
+      let url = '/future/all';
+
+      let response = await fetch(url);
+      let statusCheckedResponse = await statusCheck(response);
+      let jsonData = await statusCheckedResponse.json();
+
+      await processData(jsonData);
+    } catch (err) {
+      console.error(err);
+      throw new Error('Failed to fetch all products.');
+    }
   }
+
 
   /**
    * Generates a product element with nested elements.
@@ -445,19 +468,27 @@
   }
 
   /**
-   * this function recommended the pordcut based on the user purchase history
-   * it will call the rec endpoint to get all of history of the pets by that
-   * id
+   * Fetches the user's purchase history and generates product recommendations based on history.
+   * The function sends a GET request to the /future/rec/{userID} endpoint to retrieve
+   * the purchase history for a specific user. After checking the response status and converting
+   * the response to JSON, it passes the resulting data to the generateRecommendations function
+   * to generate personalized product recommendations.
+   *
+   * @throws {Error} If an error occurs during fetching or processing the response.
    */
-  function getRecommendedProducts() {
-    fetch(`/future/rec/${userID}`)
-      .then(statusCheck)
-      .then(response => response.json())
-      .then(boughtHistory => {
-        generateRecommendations(boughtHistory);
-      })
-      .catch(console.error);
+  async function getRecommendedProducts() {
+    try {
+      let response = await fetch(`/future/rec/${userID}`);
+      let statusCheckedResponse = await statusCheck(response);
+      let purchaseHistory = await statusCheckedResponse.json();
+
+      await generateRecommendations(purchaseHistory);
+    } catch (err) {
+      console.error(err);
+      throw new Error('Failed to fetch purchase history and generate recommendations.');
+    }
   }
+
 
   /**
    * If user does have purchase history, then it will recommend a random
@@ -482,57 +513,68 @@
     return dog > cat ? 'dog' : 'cat';
   }
 
-/**
- * Asynchronously fetches a random pet from a specified category.
- *
- * It randomly generates a petID (not greater than maxID), then fetches
- * the pet corresponding to that ID. If the pet's category matches the
- * specified category, the pet details are returned; otherwise, it generates
- * a new petID and tries again.
- *
- * @param {number} maxID - The maximum petID that can be generated.
- * @param {string} category - The pet category to be fetched.
- *
- * @returns {Object} detail - The details of the fetched pet.
- *
- * @throws {Error} If an error occurs during fetching.
- */
-async function fetchRandomPet(maxID, category) {
-  try {
-    let detail;
-    while (true) {
-      let randomID = Math.floor(Math.random() * maxID) + 1;
-      detail = await getApendRec(randomID);
-      if (detail[0].category === category) {
-        break;
+  /**
+   * Asynchronously fetches a random pet from a specified category.
+   *
+   * It randomly generates a petID (not greater than maxID), then fetches
+   * the pet corresponding to that ID. If the pet's category matches the
+   * specified category, the pet details are returned; otherwise, it generates
+   * a new petID and tries again.
+   *
+   * @param {number} maxID - The maximum petID that can be generated.
+   * @param {string} category - The pet category to be fetched.
+   *
+   * @returns {Object} detail - The details of the fetched pet.
+   *
+   * @throws {Error} If an error occurs during fetching.
+   */
+  async function fetchRandomPet(maxID, category) {
+    try {
+      let detail;
+      while (true) {
+        let randomID = Math.floor(Math.random() * maxID) + 1;
+        detail = await getApendRec(randomID);
+        if (detail[0].category === category) {
+          break;
+        }
       }
+      return detail;
+    } catch (err) {
+      console.error(err);
+      throw new Error('Failed to fetch a random pet.');
     }
-    return detail;
-  } catch (err) {
-    console.error(err);
-    throw new Error('Failed to fetch a random pet.');
   }
-}
-
 
   /**
-   * Generates a recommendation for the user based on their purchase history.
-   * @param {json} pastBought - The purchase history of the user.
+   * Asynchronously generates a recommendation for the user based on their purchase history.
+   *
+   * This function determines the category of product to recommend by calling
+   * `getRecommendationCategory` with the user's purchase history.
+   * If a category can be determined, the function fetches a random pet from
+   * that category and appends the details to the DOM.
+   * If a category cannot be determined, the function fetches details for a
+   * random pet and appends those details to the DOM.
+   *
+   * @param {Array} pastBought - An array representing the purchase history of the user.
+   * @throws {Error} If an error occurs during fetching or processing the response.
    */
-  function generateRecommendations(pastBought) {
-    const DECIMAL = 10;
-    let randomID = Math.floor(Math.random() * DECIMAL) + 1;
-    let category = getRecommendationCategory(pastBought);
-    if (category === null) {
-      getApendRec(randomID)
-        .then(detail => {
-          append(detail);
-        });
-    } else {
-      fetchRandomPet(pastBought[0].LastPetID, category)
-        .then(detail => {
-          append(detail);
-        });
+  async function generateRecommendations(pastBought) {
+    try {
+      const DECIMAL = 10;
+      let randomID = Math.floor(Math.random() * DECIMAL) + 1;
+      let category = getRecommendationCategory(pastBought);
+
+      let detail;
+      if (category === null) {
+        detail = await getApendRec(randomID);
+      } else {
+        detail = await fetchRandomPet(pastBought[0].LastPetID, category);
+      }
+
+      append(detail);
+    } catch (err) {
+      console.error(err);
+      throw new Error('Failed to generate recommendations.');
     }
   }
 
