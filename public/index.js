@@ -276,7 +276,6 @@
     }
   }
 
-
   /**
    * This funciton processed the loggged in information by
    * Successfully logged in click on back
@@ -337,7 +336,6 @@
       throw new Error('Failed to fetch all products.');
     }
   }
-
 
   /**
    * Generates a product element with nested elements.
@@ -480,15 +478,14 @@
     try {
       let response = await fetch(`/future/rec/${userID}`);
       let statusCheckedResponse = await statusCheck(response);
-      let purchaseHistory = await statusCheckedResponse.json();
+      let historyBuy = await statusCheckedResponse.json();
 
-      await generateRecommendations(purchaseHistory);
+      await generateRecommendations(historyBuy);
     } catch (err) {
       console.error(err);
       throw new Error('Failed to fetch purchase history and generate recommendations.');
     }
   }
-
 
   /**
    * If user does have purchase history, then it will recommend a random
@@ -531,13 +528,11 @@
   async function fetchRandomPet(maxID, category) {
     try {
       let detail;
-      while (true) {
-        let randomID = Math.floor(Math.random() * maxID) + 1;
+      let randomID;
+      do {
+        randomID = Math.floor(Math.random() * maxID) + 1;
         detail = await getApendRec(randomID);
-        if (detail[0].category === category) {
-          break;
-        }
-      }
+      } while (detail[0].category !== category);
       return detail;
     } catch (err) {
       console.error(err);
