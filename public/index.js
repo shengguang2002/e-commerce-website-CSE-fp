@@ -32,6 +32,10 @@
     getRecommendedProducts();
   }
 
+  /**
+   * This funciton filter the results by cat or dogs
+   * @param {string} type - on or off the for the prodcut attributes
+   */
   function filterCategory(type) {
     console.log(type);
     if(id('products').classList.contains(type)) {
@@ -42,6 +46,12 @@
     }
   }
 
+  /**
+   * This fucniton extends the filterCategory by utlizing the
+   * search api endpoint to accomplish search feature on the pets
+   * like the pet name
+   * @param {string} type -dog or cat
+   */
   async function filterChecked(type) {
     try {
       let newSearch = new FormData();
@@ -70,6 +80,10 @@
     }
   }
 
+  /**
+   * make all of the pets availiable to see by remobing the hidden
+   * class form the pets
+   */
   function filterClear() {
     let pets = id('products').querySelectorAll('.product');
     for (let pet of pets) {
@@ -77,6 +91,10 @@
     }
   }
 
+  /**
+   * when craete account is clicked it hide the product page and display
+   * the login page. It will make the craete new account visible
+   */
   function newUser() {
     id('products').classList.add('hidden');
     id('container3').classList.remove('hidden');
@@ -85,6 +103,11 @@
 
   }
 
+  /**
+   * this call the endpoint of creating a new user
+   * on the back it will enter the user name and password
+   * to the database
+   */
   function create() {
     let user = id('username').value;
     let password = id('password').value;
@@ -96,6 +119,20 @@
       .catch(console.error);
   }
 
+  /**
+   * when a new account is sucessuflly created
+   * it will show the account page and disaply
+   * Successfully logged in click on back
+   * it will also incur the get recommended product on the home page
+   * The color of the submit button will change tp gray
+   * and The title will be green
+   * a user is then able to click on the account page tp view
+   * their purchase history by enable the account button.
+   * The craete button will then be hidden form user
+   * The userId will alos be updated to the global variable for
+   * future use
+   * @param {json} responseData - form the craete account endpoint
+   */
   function processCreateData(responseData) {
     console.log(responseData.changes);
     if (responseData.changes > 0) {
@@ -114,6 +151,12 @@
     }
   }
 
+  /**
+   * This function will contains all of the purchase history of the a logged
+   * account. It does so by checking if the userID has values. Then it call the
+   * purcchasehistory endpoint to get purshcase information on the user. The json
+   * information will then be returned and the data will appended to the page.
+   */
   async function purchaseHistory() {
     if(!userID) {
       console.log("login first!");
@@ -180,6 +223,10 @@
     id('search-btn').disabled = !id('search-term').value.trim();
   }
 
+  /**
+   * The login page is inccured when the user clicked the login button
+   * the product page will be hidden and login page will be visible to see
+   */
   function loginPage() {
     id('products').classList.add('hidden');
     id('container3').classList.remove('hidden');
@@ -187,6 +234,10 @@
     console.log('hi');
   }
 
+  /**
+   * The back button takes the user bakc the product page by enable the hidden
+   * prodcuts to be reappear and hide the other elements
+   */
   function backToMain() {
     console.log("retirn");
     id('products').classList.remove('hidden');
@@ -195,6 +246,11 @@
     id('purchase-history').classList.add('hidden');
   }
 
+  /**
+   * the login page call the login endpoint by insert username and password
+   * use post method. The api then return the information to processLoginData
+   * for future processing.
+   */
   function login() {
     console.log('login');
     let user = id('username').value;
@@ -211,7 +267,19 @@
       .catch(console.error);
   }
 
-
+  /**
+   * This funciton processed the loggged in information by
+   * Successfully logged in click on back
+   * it will also incur the get recommended product on the home page
+   * The color of the submit button will change tp gray
+   * and The title will be green
+   * a user is then able to click on the account page tp view
+   * their purchase history by enable the account button.
+   * The craete button will then be hidden form user
+   * The userId will alos be updated to the global variable for
+   * future use
+   * @param {json} responseData - the userid
+   */
   function processLoginData(responseData) {
     console.log(responseData);
     if (responseData.length > 0){
@@ -230,6 +298,9 @@
     }
   }
 
+  /**
+   * save the username
+   */
   function save(){
     id('username').textContent = userEmail;
   }
@@ -247,7 +318,6 @@
       .catch(console.error);
   }
 
-  //能不能单独拆分成一个function?
   /**
    * The processData will generate a list of products and makae each prodcut
    * clickable
@@ -305,7 +375,11 @@
     }
     id('products').appendChild(productTotal);
   }
-
+  /**
+   * This funciton input all of informaiton like seller info, name, price
+   * when user clicked on the view button
+   * @param {json} para
+   */
   function viewItem(para) {
     console.log(para);
     id('products').classList.add('hidden');
@@ -320,7 +394,9 @@
     qs('#container2 h1').textContent = "AiPets: " + para.Name + " (" + para.category + ")";
   }
 
-
+  /**
+   * it switch the grid view when click on the button
+   */
   function checkGrid() {
     let pets = id('home').querySelectorAll('.pet');
       for (let pet of pets) {
@@ -336,6 +412,11 @@
       }
   }
 
+  /**
+   * this function recommended the pordcut based on the user purchase history
+   * it will call the rec endpoint to get all of history of the pets by that
+   * id
+   */
   function getRecommendedProducts() {
     fetch(`/future/rec/${userID}`)
       .then(statusCheck)
@@ -346,6 +427,13 @@
       .catch(console.error);
   }
 
+  /**
+   * if user has not purchased anything, then it will recommended a random
+   * pet to be shown on the screen
+   * if user does have purchase hisytory. then it will recommneed a random
+   * cat or dog pets based number of cat pets or dog oets user purchased.
+   * @param {json} purchaseHistory
+   */
   function generateRecommendations(purchaseHistory) {
     if (purchaseHistory.length === 0) {
       let randomID = Math.floor(Math.random() * 10) + 1;
@@ -392,6 +480,11 @@
     }
   }
 
+  /**
+   * this call get endpoint by input the id
+   * @param {int} ID
+   * @returns
+   */
   function getApendRec(ID) {
     let randomID = new FormData();
     randomID.append("petID", ID);
@@ -404,6 +497,10 @@
       .catch(console.error);
   }
 
+  /**
+   * this creates the new recommended pet
+   * @param {json} responseData
+   */
   function append(responseData) {
     let product = gen('div');
     let word = gen('h1');
