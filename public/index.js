@@ -136,7 +136,8 @@
    *
    * In addition, it updates the global userID variable with the lastID from the response data.
    *
-   * @param {Object} responseData - The response from the create account endpoint, expected to include 'changes' and 'lastID' properties.
+   * @param {Object} responseData - The response from the create account endpoint,
+   * expected to include 'changes' and 'lastID' properties.
    */
   function processCreateData(responseData) {
     if (responseData.changes > 0) {
@@ -481,27 +482,38 @@
     return dog > cat ? 'dog' : 'cat';
   }
 
-  /**
-   * Fetches a random pet from a specified category.
-   * @param {number} maxID - The maximum petID to be fetched.
-   * @param {string} category - The pet category to fetch.
-   * @returns {Promise} - A promise with the pet details.
-   */
-  function fetchRandomPet(maxID, category) {
+/**
+ * Asynchronously fetches a random pet from a specified category.
+ *
+ * It randomly generates a petID (not greater than maxID), then fetches
+ * the pet corresponding to that ID. If the pet's category matches the
+ * specified category, the pet details are returned; otherwise, it generates
+ * a new petID and tries again.
+ *
+ * @param {number} maxID - The maximum petID that can be generated.
+ * @param {string} category - The pet category to be fetched.
+ *
+ * @returns {Object} detail - The details of the fetched pet.
+ *
+ * @throws {Error} If an error occurs during fetching.
+ */
+async function fetchRandomPet(maxID, category) {
+  try {
     let detail;
-    const fetchUntilCategoryMatches = () => {
+    while (true) {
       let randomID = Math.floor(Math.random() * maxID) + 1;
-      return getApendRec(randomID)
-        .then(data => {
-          detail = data;
-          if (detail[0].category !== category) {
-            return fetchUntilCategoryMatches();
-          }
-          return detail;
-        });
-    };
-    return fetchUntilCategoryMatches();
+      detail = await getApendRec(randomID);
+      if (detail[0].category === category) {
+        break;
+      }
+    }
+    return detail;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Failed to fetch a random pet.');
   }
+}
+
 
   /**
    * Generates a recommendation for the user based on their purchase history.
