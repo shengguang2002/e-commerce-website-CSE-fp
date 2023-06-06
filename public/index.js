@@ -145,7 +145,7 @@
       userID = responseData.lastID;
       id("submits").removeEventListener("click", login);
       id("submits").style.color = "gray";
-      qs('#container3 h1').textContent = "Successfully logged in click on back"
+      qs('#container3 h1').textContent = "Successfully logged in click on back";
       qs('#container3 h1').style.color = "green";
       id('user').addEventListener('click', purchaseHistory);
       id('create').classList.add('hidden');
@@ -162,12 +162,12 @@
    * information will then be returned and the data will appended to the page.
    */
   async function purchaseHistory() {
-    if(userID) {
+    if (userID) {
       try {
         let response = await fetch(`/future/purchasehistory?userID=${userID}`);
         await statusCheck(response);
         let rows = await response.json();
-        qs('#purchase-history h2').textContent = `Purchase History for `+ userEmail;
+        qs('#purchase-history h2').textContent = `Purchase History for ` + userEmail;
         id('products').classList.add('hidden');
         id('container3').classList.add('hidden');
         id('container2').classList.add('hidden');
@@ -279,13 +279,13 @@
    * @param {json} responseData - the userid
    */
   function processLoginData(responseData) {
-    if (responseData.length > 0){
+    if (responseData.length > 0) {
       id('user').classList.remove('hidden');
       id('newuser').classList.add('hidden');
       userID = responseData[0].userID;
       id("submits").removeEventListener("click", login);
       id("submits").style.color = "gray";
-      qs('#container3 h1').textContent = "Successfully logged in click on back"
+      qs('#container3 h1').textContent = "Successfully logged in click on back";
       qs('#container3 h1').style.color = "green";
       id('user').addEventListener('click', purchaseHistory);
       id('save').classList.remove('hidden');
@@ -298,7 +298,7 @@
   /**
    * save the username
    */
-  function save(){
+  function save() {
     id('username').textContent = userEmail;
   }
 
@@ -380,9 +380,9 @@
     viewButton.textContent = 'view item';
     viewButton.addEventListener('click', () => viewItem(pet));
 
-    sellButton.textContent ='Buy Now!';
+    sellButton.textContent = 'Buy Now!';
     sellButton.addEventListener('click', async () => {
-      if(userID) {
+      if (userID) {
         let newBuy = new FormData();
         newBuy.append("userID", userID);
         newBuy.append("price", pet.Price);
@@ -411,7 +411,6 @@
     id('products').appendChild(productTotal);
   }
 
-
   /**
    * This funciton input all of informaiton like seller info, name, price
    * when user clicked on the view button
@@ -420,10 +419,9 @@
   function viewItem(para) {
     id('products').classList.add('hidden');
     id('container2').classList.remove('hidden');
-    qs('#product-image img').src ='img/' + para.Name + '.jpg';
+    qs('#product-image img').src = 'img/' + para.Name + '.jpg';
     id('product-price').textContent = '$' + para.Price;
-    id('seller-info').textContent='Sold by ' + para.seller
-    + ", and Shiped from " + para.region;
+    id('seller-info').textContent = 'Sold by ' + para.seller + ", and Shiped from " + para.region;
     qs('#container2 h1').textContent = "AiPets: " + para.Name + " (" + para.category + ")";
   }
 
@@ -431,18 +429,20 @@
    * it switch the grid view when click on the button
    */
   function checkGrid() {
-    let pets = id('home').querySelectorAll('.pet');
-      for (let pet of pets) {
-        if (pet.classList.contains('add')) {
-          pet.classList.add('off');
-          pet.classList.remove('add');
-          pet.style.display = "block";
-        } else {
-          pet.classList.remove('off');
-          pet.classList.add('add');
-          pet.style.display = "";
-        }
+    console.log("start");
+    let pets = id('products').querySelectorAll('.product');
+    console.log(pets);
+    for (let pet of pets) {
+      if (pet.classList.contains('add')) {
+        pet.classList.add('off');
+        pet.classList.remove('add');
+        pet.style.display = "block";
+      } else {
+        pet.classList.remove('off');
+        pet.classList.add('add');
+        pet.style.display = "";
       }
+    }
   }
 
   /**
@@ -454,30 +454,24 @@
     fetch(`/future/rec/${userID}`)
       .then(statusCheck)
       .then(response => response.json())
-      .then(purchaseHistory => {
-        generateRecommendations(purchaseHistory);
+      .then(boughtHistory => {
+        generateRecommendations(boughtHistory);
       })
       .catch(console.error);
   }
 
   /**
-   * if user has not purchased anything, then it will recommended a random
-   * pet to be shown on the screen
-   * if user does have purchase hisytory. then it will recommneed a random
-   * cat or dog pets based number of cat pets or dog oets user purchased.
-   * @param {json} purchaseHistory
+   * If user does have purchase history, then it will recommend a random
+   * cat or dog pets based on the number of cat or dog pets user purchased.
+   * @param {Array} purchaseHistory - The purchase history of the user.
+   * @returns {string} - The pet category to recommend. If no history, returns null.
    */
-  function generateRecommendations(purchaseHistory) {
+  function getRecommendationCategory(purchaseHistory) {
     if (purchaseHistory.length === 0) {
-      let randomID = Math.floor(Math.random() * 10) + 1;
-      getApendRec(randomID)
-        .then(detail => {
-          append(detail);
-        });
+      return null;
     } else {
       let dog = 0;
       let cat = 0;
-      let random = Math.floor(Math.random() * purchaseHistory[0].LastPetID) + 1;
 
       for (let i = 0; i < purchaseHistory.length; i++) {
         if (purchaseHistory[i].category === 'dog') {
@@ -486,48 +480,69 @@
           cat += 1;
         }
       }
-      if (dog > cat) {
-        let detail;
-        const fetchRandomPet = () => {
-          random = Math.floor(Math.random() * purchaseHistory[0].LastPetID) + 1;
-          return getApendRec(random)
-            .then(data => {
-              detail = data;
-              if (detail[0].category !== 'dog') {
-                return fetchRandomPet();
-              }
-              return detail;
-            });
-        };
-        fetchRandomPet()
-          .then(detail => {
-            append(detail);
-          });
-      }
-       else {
-        getApendRec(randomID)
-        .then(detail => {
-          append(detail);
-        });
-      }
+      return dog > cat ? 'dog' : 'cat';
     }
   }
 
   /**
-   * this call get endpoint by input the id
-   * @param {int} ID
-   * @returns
+   * Fetches a random pet from a specified category.
+   * @param {number} maxID - The maximum petID to be fetched.
+   * @param {string} category - The pet category to fetch.
+   * @returns {Promise} - A promise with the pet details.
    */
-  function getApendRec(ID) {
-    let randomID = new FormData();
-    randomID.append("petID", ID);
-    return fetch('/future/get', { method: 'POST', body: randomID })
-      .then(statusCheck)
-      .then(response => response.json())
-      .then(purchaseHistory => {
-        return purchaseHistory;
-      })
-      .catch(console.error);
+  function fetchRandomPet(maxID, category) {
+    let detail;
+    const fetchUntilCategoryMatches = () => {
+      let randomID = Math.floor(Math.random() * maxID) + 1;
+      return getApendRec(randomID)
+        .then(data => {
+          detail = data;
+          if (detail[0].category !== category) {
+            return fetchUntilCategoryMatches();
+          }
+          return detail;
+        });
+    };
+    return fetchUntilCategoryMatches();
+  }
+
+  /**
+   * Generates a recommendation for the user based on their purchase history.
+   * @param {json} purchaseHistory - The purchase history of the user.
+   */
+  function generateRecommendations(purchaseHistory) {
+    let randomID = Math.floor(Math.random() * 10) + 1;
+    let category = getRecommendationCategory(purchaseHistory);
+    if (category === null) {
+      getApendRec(randomID)
+        .then(detail => {
+          append(detail);
+        });
+    } else {
+      fetchRandomPet(purchaseHistory[0].LastPetID, category)
+        .then(detail => {
+          append(detail);
+        });
+    }
+  }
+
+
+  /**
+   * Makes a POST request to the '/future/get' endpoint with a specified Pet ID.
+   * @param {number} ID - The ID of the Pet to retrieve from the database.
+   * @returns {Promise<Object>} - A Promise that resolves to the Pet data retrieved from the database.
+   */
+  async function getApendRec(ID) {
+    try {
+      let randomID = new FormData();
+      randomID.append("petID", ID);
+      let response = await fetch('/future/get', {method: 'POST', body: randomID});
+      await statusCheck(response);
+      let boughtHistory = await response.json();
+      return boughtHistory;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   /**

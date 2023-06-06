@@ -80,20 +80,20 @@ app.post('/future/search', async (req, res) => {
  * @param {string} req - Express request object.
  * @param {string} res - Express response object.
  */
-app.post('/future/login', async (rq, rs) => {
+app.post('/future/login', async (req, res) => {
   try {
     let db = await getDBConnection();
-    let user = rq.body.name;
-    let password = rq.body.password;
+    let user = req.body.name;
+    let password = req.body.password;
     let all = "SELECT userID FROM login WHERE email = ? and digit = ?";
     let getAll = await db.all(all, [user, password]);
     if (getAll.length > 0) {
-      rs.type('text');
-      rs.send(getAll);
+      res.type('text');
+      res.send(getAll);
     } else {
-      rs.type('text');
-      rs.status(ERROR_CODE);
-      rs.send('incorrect login information');
+      res.type('text');
+      res.status(ERROR_CODE);
+      res.send('incorrect login information');
     }
     await db.close();
   } catch (error) {

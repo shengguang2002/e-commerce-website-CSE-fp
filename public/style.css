@@ -202,8 +202,7 @@ button:hover {
   margin-bottom: 20px;
 }
 
-.buy-button,
-.add-to-cart-button {
+.buy-button {
   padding: 10px 20px;
   background-color: #ff4c4c;
   border: none;
@@ -213,8 +212,7 @@ button:hover {
   margin-right: 10px;
 }
 
-.buy-button:hover,
-.add-to-cart-button:hover {
+.buy-button:hover {
   background-color: #ff0000;
 }
 
