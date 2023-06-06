@@ -42,6 +42,7 @@ GET /all
 ```
 
 **Error Handling:**
+
 Possible 500 (server error) SERVER_ERROR
 
 ## Search for Pets
@@ -78,6 +79,7 @@ Body:
 
 **Error Handling:**
 Possible 400 (invalid request) error if search or search type is not provided
+
 Possible 500 (server error) SERVER_ERROR
 
 ## User Login
@@ -107,6 +109,7 @@ Body:
 
 **Error Handling:**
 Possible 400 (invalid request) error if account is not founded
+
 Possible 500 (server error) SERVER_ERROR
 
 ## User Information
@@ -133,6 +136,7 @@ GET /info/moazzed@uneunu.lr/4952072
 
 **Error Handling:**
 Possible 400 (invalid request) error if email or digit is not provided
+
 Possible 500 (server error) SERVER_ERROR
 
 ## Buy a Pet
@@ -164,6 +168,7 @@ Status: 200 OK
 
 **Error Handling:**
 Possible 400 (invalid request) error if userID or price or petID is not provided
+
 Possible 500 (server error) SERVER_ERROR
 
 ## Purchase History
@@ -203,6 +208,7 @@ GET /purchasehistory?userID=1
 
 **Error Handling:**
 Possible 400 (invalid request) error if userID is not provided
+
 Possible 500 (server error) SERVER_ERROR
 
 ## User Recommendations
@@ -241,6 +247,7 @@ GET /rec/1
 
 **Error Handling:**
 Possible 400 (invalid request) error if user is not provided
+
 Possible 500 (server error) SERVER_ERROR
 
 ## Get Pet Information
@@ -274,4 +281,5 @@ Body:
 ```
 **Error Handling:**
 Possible 400 (invalid request) error if petID is not provided
+
 Possible 500 (server error) SERVER_ERROR
