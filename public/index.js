@@ -29,6 +29,7 @@
     id('dog').addEventListener('click', () => filterCategory("dog"));
     id('back-button2').addEventListener('click', backToMain);
     id('back-button3').addEventListener('click', backToMain);
+    id('back-button4').addEventListener('click', backToMain);
     getRecommendedProducts();
   }
 

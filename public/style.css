@@ -4,7 +4,7 @@
   This is the styles.css page for final project.
 */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Coda Caption', sans-serif;
   font-size: 16px;
   line-height: 1.5;
   margin: 0;
@@ -69,7 +69,8 @@ h2 {
 }
 
 .product img {
-  max-width: 50%;
+  width: 200px;
+  height: 200px;
 }
 
 .product h2 {

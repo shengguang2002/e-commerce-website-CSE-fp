@@ -12,4 +12,17 @@ CREATE TABLE purchase (
 );
 DROP TABLE Bought;
 
---DELETE FROM purchase; 拿来重置purchase库
+CREATE TABLE AlPets (
+  PetID INT PRIMARY KEY,
+  Name VARCHAR(50),
+  Price DECIMAL(10, 2),
+  Category VARCHAR(50),
+  Seller VARCHAR(50),
+  Region VARCHAR(50)
+);
+
+CREATE TABLE users (
+  email VARCHAR(255),
+  digit DECIMAL(18,1),
+  userID INT
+);
