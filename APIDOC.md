@@ -187,7 +187,7 @@ Example Response:
 - **Endpoint**: `/rec/:user`
 - **Method**: GET
 - **Description**: Get recommendations for a user based on their user ID. It
-                    will return all of the pet uder the yser account
+                    will return all of the pet under the user account
 - **Request Format**: URL parameter
   - `user` (required): The user ID to get recommendations for.
 - **Response Format**: JSON
