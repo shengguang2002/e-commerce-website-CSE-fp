@@ -148,7 +148,7 @@
       id('create').classList.add('hidden');
       id('newuser').classList.add('hidden');
       getRecommendedProducts();
-      id('Recproducts').classList.remove('hidden');
+      id('recommend-production').classList.remove('hidden');
     }
   }
 
@@ -295,7 +295,7 @@
       id('save').classList.remove('hidden');
       id('save').addEventListener('click', save);
       getRecommendedProducts();
-      id('Recproducts').classList.remove('hidden');
+      id('recommend-production').classList.remove('hidden');
     }
   }
 
@@ -340,6 +340,7 @@
       let result = 'Future_PETS/' + responseData['Pets'][i].Name + '.jpg';
       word.textContent = responseData['Pets'][i].Name;
       img.src = result;
+      img.alt = "picture of " + responseData['Pets'][i].Name;
       product.classList.add('product');
       p1.classList.add('price');
       p2.classList.add('description');
@@ -512,7 +513,7 @@
     product.appendChild(word);
     product.appendChild(img);
     product.classList.add('product');
-    id('Recproducts').appendChild(product);
+    id('recommend-production').appendChild(product);
   }
 
 
