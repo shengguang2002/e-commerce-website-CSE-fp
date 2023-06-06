@@ -10,7 +10,7 @@
  */
 "use strict";
 (function() {
-  let userID = 121;
+  let userID = null;
   let userEmail = null;
   window.addEventListener("load", init);
 
@@ -41,8 +41,7 @@
    * @param {string} type - on or off the for the prodcut attributes
    */
   function filterCategory(type) {
-    console.log(type);
-    if(id('products').classList.contains(type)) {
+    if (id('products').classList.contains(type)) {
       id('products').classList.remove(type);
       filterClear();
     } else {
@@ -70,7 +69,6 @@
         ids.push(row.PetID);
       }
       let pets = id('products').querySelectorAll('.product');
-      console.log(pets);
       for (let pet of pets) {
         if (!ids.includes(parseInt(pet.id))) {
           pet.classList.add('hidden');
@@ -112,15 +110,18 @@
    * on the back it will enter the user name and password
    * to the database
    */
-  function create() {
-    let user = id('username').value;
-    let password = id('password').value;
-    let url = '/future/info/' + user + '/' + password
-    fetch(url)
-      .then(statusCheck)
-      .then(resp => resp.json())
-      .then(processCreateData)
-      .catch(console.error);
+  async function create() {
+    try {
+      let user = id('username').value;
+      let password = id('password').value;
+      let url = '/future/info/' + user + '/' + password;
+      let response = await fetch(url);
+      await statusCheck(response);
+      let rows = await response.json();
+      processCreateData(rows);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   /**
@@ -135,10 +136,9 @@
    * The craete button will then be hidden form user
    * The userId will alos be updated to the global variable for
    * future use
-   * @param {json} responseData - form the craete account endpoint
+   * @param {js object} responseData - form the craete account endpoint
    */
   function processCreateData(responseData) {
-    console.log(responseData.changes);
     if (responseData.changes > 0) {
       id('user').classList.remove('hidden');
       id('newuser').classList.add('hidden');
@@ -162,9 +162,7 @@
    * information will then be returned and the data will appended to the page.
    */
   async function purchaseHistory() {
-    if(!userID) {
-      console.log("login first!");
-    } else {
+    if(userID) {
       try {
         let response = await fetch(`/future/purchasehistory?userID=${userID}`);
         await statusCheck(response);
@@ -206,7 +204,6 @@
         ids.push(row.PetID);
       }
       let pets = id('products').querySelectorAll('.product');
-      console.log(pets);
       for (let pet of pets) {
         if (!ids.includes(parseInt(pet.id))) {
           pet.classList.add('hidden');
@@ -235,7 +232,6 @@
     id('products').classList.add('hidden');
     id('container3').classList.remove('hidden');
     id('submits').addEventListener('click', login);
-    console.log('hi');
   }
 
   /**
@@ -243,7 +239,6 @@
    * prodcuts to be reappear and hide the other elements
    */
   function backToMain() {
-    console.log("retirn");
     id('products').classList.remove('hidden');
     id('container3').classList.add('hidden');
     id('recommend-production').classList.add('hidden');
@@ -257,10 +252,8 @@
    * for future processing.
    */
   function login() {
-    console.log('login');
     let user = id('username').value;
     let password = id('password').value;
-    console.log(user);
     let url = '/future/login';
     let params = new FormData();
     params.append("name", user);
@@ -286,7 +279,6 @@
    * @param {json} responseData - the userid
    */
   function processLoginData(responseData) {
-    console.log(responseData);
     if (responseData.length > 0){
       id('user').classList.remove('hidden');
       id('newuser').classList.add('hidden');
@@ -324,75 +316,110 @@
   }
 
   /**
-   * The processData will generate a list of products and makae each prodcut
-   * clickable
+   * Generates a product element with nested elements.
+   * @param {Object} pet - The pet data.
+   * @returns {HTMLElement} The product element.
+   */
+  function generateProductElement(pet) {
+    let product = gen('div');
+    let word = gen('h1');
+    let p1 = gen('p');
+    let p2 = gen('p');
+    let p3 = gen('p');
+    let sellButton = gen('button');
+    let viewButton = gen('button');
+    let img = gen('img');
+
+    product.classList.add('product');
+    p1.classList.add('price');
+    p2.classList.add('description');
+    p3.classList.add('description');
+    viewButton.id = 'view';
+    sellButton.id = 'add';
+
+    product.appendChild(word);
+    product.appendChild(img);
+    product.appendChild(p2);
+    product.appendChild(p3);
+    product.appendChild(p1);
+    product.appendChild(viewButton);
+    product.appendChild(sellButton);
+    product.id = pet.PetID;
+    return product;
+  }
+
+  /**
+   * Sets the text content of a product element.
+   * @param {HTMLElement} product - The product element.
+   * @param {Object} pet - The pet data.
+   */
+  function setProductTextContent(product, pet) {
+    let word = product.querySelector('h1');
+    let p1 = product.querySelector('.price');
+    let p2 = product.querySelector('.description:nth-child(3)');
+    let p3 = product.querySelector('.description:nth-child(4)');
+    let img = product.querySelector('img');
+
+    word.textContent = pet.Name;
+    img.src = 'img/' + pet.Name + '.jpg';
+    img.alt = "picture of " + pet.Name;
+    p1.textContent = "$" + pet.Price;
+    p2.textContent = "Seller: " + pet.seller;
+    p3.textContent = "From: " + pet.region;
+  }
+
+  /**
+   * Sets event listeners for buttons in a product element.
+   * @param {HTMLElement} product - The product element.
+   * @param {Object} pet - The pet data.
+   */
+  function setProductEventListeners(product, pet) {
+    let sellButton = product.querySelector('#add');
+    let viewButton = product.querySelector('#view');
+
+    viewButton.textContent = 'view item';
+    viewButton.addEventListener('click', () => viewItem(pet));
+
+    sellButton.textContent ='Buy Now!';
+    sellButton.addEventListener('click', async () => {
+      if(userID) {
+        let newBuy = new FormData();
+        newBuy.append("userID", userID);
+        newBuy.append("price", pet.Price);
+        newBuy.append("petID", pet.PetID);
+        await fetch('/future/buy', {method: 'POST', body: newBuy});
+      }
+    });
+  }
+
+  /**
+   * The processData will generate a list of products and make each product clickable.
    * @param {JSON} responseData -the api data of products
    */
   function processData(responseData) {
     let productTotal = gen('div');
     productTotal.classList.add('on');
     productTotal.classList.add('pet');
+
     for (let i = 0; i < responseData['Pets'].length; i++) {
-      let product = gen('div');
-      let word = gen('h1');
-      let p1 = gen('p');
-      let p2 = gen('p');
-      let p3 = gen('p');
-      let sellButton = gen('button');
-      let viewButton = gen('button');
-      let img = gen('img');
-      let result = 'img/' + responseData['Pets'][i].Name + '.jpg';
-      word.textContent = responseData['Pets'][i].Name;
-      img.src = result;
-      img.alt = "picture of " + responseData['Pets'][i].Name;
-      product.classList.add('product');
-      p1.classList.add('price');
-      p2.classList.add('description');
-      p3.classList.add('description');
-      viewButton.id = 'view';
-      viewButton.textContent = 'view item';
-      viewButton.addEventListener('click', () => viewItem(responseData['Pets'][i]));
-      sellButton.id = 'add';
-      sellButton.textContent ='Buy Now!';
-      sellButton.addEventListener('click', async () => {
-        if(userID) {
-          console.log("selling!!");
-          let newBuy = new FormData();
-          newBuy.append("userID", userID);
-          newBuy.append("price", responseData['Pets'][i].Price);
-          newBuy.append("petID", responseData['Pets'][i].PetID);
-          await fetch('/future/buy', {method: 'POST', body: newBuy});
-        } else {
-          console.log("login first!");
-        }
-      });
-      p1.textContent = "$" + responseData['Pets'][i].Price;
-      p2.textContent = "Seller: " + responseData['Pets'][i].seller;
-      p3.textContent = "From: " + responseData['Pets'][i].region;
-      product.appendChild(word);
-      product.appendChild(img);
-      product.appendChild(p2);
-      product.appendChild(p3);
-      product.appendChild(p1);
-      product.appendChild(viewButton);
-      product.appendChild(sellButton);
-      product.id = responseData['Pets'][i].PetID;
+      let product = generateProductElement(responseData['Pets'][i]);
+      setProductTextContent(product, responseData['Pets'][i]);
+      setProductEventListeners(product, responseData['Pets'][i]);
+
       productTotal.appendChild(product);
     }
     id('products').appendChild(productTotal);
   }
+
+
   /**
    * This funciton input all of informaiton like seller info, name, price
    * when user clicked on the view button
-   * @param {json} para
+   * @param {Object} para - Item parameter object
    */
   function viewItem(para) {
-    console.log(para);
     id('products').classList.add('hidden');
     id('container2').classList.remove('hidden');
-    let name = para.Name;
-    let result = 'img/' + name + '.jpg';
-    let price = para.Price;
     qs('#product-image img').src ='img/' + para.Name + '.jpg';
     id('product-price').textContent = '$' + para.Price;
     id('seller-info').textContent='Sold by ' + para.seller
@@ -406,14 +433,14 @@
   function checkGrid() {
     let pets = id('home').querySelectorAll('.pet');
       for (let pet of pets) {
-        if (id('pet').classList.contains('add')) {
-          id('pet').classList.add('off');
-          id('pet').classList.remove('add');
-          id('pet').style.display = "block";
+        if (pet.classList.contains('add')) {
+          pet.classList.add('off');
+          pet.classList.remove('add');
+          pet.style.display = "block";
         } else {
-          id('pet').classList.remove('off');
-          id('pet').classList.add('add');
-          id('pet').style.display = "";
+          pet.classList.remove('off');
+          pet.classList.add('add');
+          pet.style.display = "";
         }
       }
   }
@@ -451,7 +478,7 @@
       let dog = 0;
       let cat = 0;
       let random = Math.floor(Math.random() * purchaseHistory[0].LastPetID) + 1;
-      console.log(random);
+
       for (let i = 0; i < purchaseHistory.length; i++) {
         if (purchaseHistory[i].category === 'dog') {
           dog += 1;
@@ -505,7 +532,7 @@
 
   /**
    * this creates the new recommended pet
-   * @param {json} responseData
+   * @param {json} responseData formulated recommended pet's data
    */
   function append(responseData) {
     let product = gen('div');
@@ -520,7 +547,6 @@
     id('recommend-production').appendChild(product);
   }
 
-
   /**
    * check the fecth call
    * @param {element} res - fetch response data
@@ -532,7 +558,6 @@
     }
     return res;
   }
-
 
   /**
    * short function for get element by id
@@ -552,12 +577,12 @@
     return document.createElement(generate);
   }
 
-    /**
+  /**
    * short function for queryselector
    * @param {string} selector -the element string
    * @returns {Element} - the element
    */
-    function qs(selector) {
-      return document.querySelector(selector);
-    }
+  function qs(selector) {
+    return document.querySelector(selector);
+  }
 })();

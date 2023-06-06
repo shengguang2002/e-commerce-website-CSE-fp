@@ -30,8 +30,8 @@ const PORT_NUM = 8000;
  */
 async function getDBConnection() {
   const db = await sqlite.open({
-      filename: 'finalproject.db',
-      driver: sqlite3.Database
+    filename: 'finalproject.db',
+    driver: sqlite3.Database
   });
   return db;
 }
@@ -61,8 +61,7 @@ app.get('/future/all', async (req, res) => {
  */
 app.post('/future/search', async (req, res) => {
   try {
-    //console.log(req.body.search);
-    if(!req.body.search || !req.body.type) {
+    if (!req.body.search || !req.body.type) {
       res.status(ERROR_CODE).send('Missing one or more of the required params.');
       return;
     }
@@ -113,9 +112,9 @@ app.get('/future/info/:email/:digit', async (req, res) => {
     let db = await getDBConnection();
     let email = req.params["email"];
     let digit = req.params["digit"];
-    if (email != '' || digit != '') {
+    if (email !== '' || digit !== '') {
       let all = "INSERT INTO login (email, digit) VALUES (?, ?)";
-      let getAll = await db.all(all, [email, digit]);
+      await db.all(all, [email, digit]);
       let result = "SELECT userID FROM login ORDER BY userID DESC LIMIT 1";
       let getResult = await db.run(result);
       res.type('json');
@@ -142,12 +141,9 @@ app.post('/future/buy', async (req, res) => {
       return;
     }
     let db = await getDBConnection();
-    console.log("check");
     let sql = `INSERT INTO purchase (userID, price, petID, date)
     VALUES (?, ?, ?, CURRENT_TIMESTAMP)`;
-    console.log("check1");
     await db.run(sql, [req.body.userID, req.body.price, req.body.petID]);
-    console.log("check12");
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
@@ -161,7 +157,7 @@ app.post('/future/buy', async (req, res) => {
  */
 app.get('/future/purchasehistory', async (req, res) => {
   try {
-    if(!req.query.userID) {
+    if (!req.query.userID) {
       res.status(ERROR_CODE).send('Missing one or more of the required params.');
       return;
     }
@@ -185,7 +181,7 @@ app.get('/future/rec/:user', async (req, res) => {
   try {
     let db = await getDBConnection();
     let user = req.params["user"];
-    if (user != '') {
+    if (user !== '') {
       let all = 'SELECT A.Name, A.Price, A.category, \
                   (SELECT MAX(PetID) FROM AlPets) AS LastPetID \
                   FROM purchase \
@@ -211,7 +207,7 @@ app.get('/future/rec/:user', async (req, res) => {
  */
 app.post('/future/get', async (req, res) => {
   try {
-    if(!req.body.petID) {
+    if (!req.body.petID) {
       res.status(ERROR_CODE).send('Missing one or more of the required params.');
       return;
     }
@@ -226,7 +222,7 @@ app.post('/future/get', async (req, res) => {
   } catch (err) {
     res.status(SERVER_ERROR_CODE).send('An error occurred on the server. Try again later.');
   }
-})
+});
 
 // Middleware to serve static files from the "public" directory
 app.use(express.static('public'));
